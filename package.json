@@ -9,6 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/server": "^11.11.0",
+    "@mantine/core": "^5.10.5",
+    "@mantine/hooks": "^5.10.5",
+    "@mantine/next": "^5.10.5",
+    "@tabler/icons-react": "^2.20.0",
+    "@types/lodash": "^4.14.195",
+    "lodash": "^4.17.21",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0"
