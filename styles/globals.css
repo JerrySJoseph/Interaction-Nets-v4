@@ -1,26 +1,96 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
+/*Now the CSS*/
+:root {
+  --connector-width: 2px;
+  --connector-default-color: #ccc;
 }
 
 * {
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+.canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  border: solid 1px white;
+  border-radius: 10px;
+}
+
+.level {
+  display: 'flex';
+  justify-content: center;
+  width: 100%;
+  border: solid 1px yellow;
+}
+
+.node {
+  min-width: 50px;
+  min-height: 50px;
+  color: black;
+  font-size: large;
+  border: solid 3px white;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  padding: 10px;
+}
+
+.node-thumbnail{
+  position: relative;
+  z-index: inherit;
+}
+
+.node-constant {
+  border-radius: 50%;
+}
+
+.node-operator {
+  border-radius: 10px;
+}
+
+.node-result{
+  border-radius: 10px;
+}
+.link {
+  position: 'absolute';
+  top: 0;
+  left: 0;
+  width: '100%';
+  height: '100%';
+  z-index: 1;
+}
+
+.control-panel{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  
+}
+
+.draggable {
+  cursor: move;
+  /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.edge {
+  position: absolute;
+  background-color: white;
+  height: 2px;
+  transform-origin: top left;
 }
