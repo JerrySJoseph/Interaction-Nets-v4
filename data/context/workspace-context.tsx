@@ -20,7 +20,9 @@ interface WorkspaceContextProps {
         setInetState: (inet: InteractionNetState) => any,
         moveNode: (x: number, y: number, id: string) => any,
         updateAgent: (agent: Agent) => any,
-        deleteAgent: (agentId: string) => any
+        deleteAgent: (agentId: string) => any,
+        connectAgent:(source:string,target:string)=>any,
+        removeConnection:(source:string,target:string)=>any
     },
 
     currentInetRules: {
@@ -48,7 +50,9 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         setInetState: () => { },
         moveNode: () => { },
         updateAgent: () => { },
-        deleteAgent: () => { }
+        deleteAgent: () => { },
+        connectAgent:()=>{},
+        removeConnection:()=>{}
     },
     currentInetRules: {
         inetRules: [],
@@ -71,7 +75,7 @@ interface WorkspaceContextProviderProps {
 
 export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderProps) => {
 
-    const [currentTool, setCurrentTool] = useState<string>('');
+    const [currentTool, setCurrentTool] = useState<string>('DRAG');
     const [inetRules, setInetRules] = useState<InteractionRule[]>([]);
     const [inetState, setInetState] = useState<InteractionNetState>({
         agents: {},
@@ -79,7 +83,10 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     })
     const [previousInetStates, setPreviousInetStates] = useState<InteractionNetState[]>([]);
 
-    
+    const [connector, setConnector] = useState<{ source: string, target: string }>({
+        source: '',
+        target: ''
+    })
 
 
     useEffect(() => {
@@ -124,6 +131,32 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         ])
     }
 
+    function connectAgent(source:string,target:string){
+        const inetCopy={...inetState};
+        const sourceAgent=inetCopy.agents[source];
+        if(sourceAgent && sourceAgent.type!=='NUMBER' && !sourceAgent.auxiliaryPorts.includes(target)){
+            sourceAgent.auxiliaryPorts.push(target);
+        }
+        setInetState(inetCopy);
+    }
+
+    function removeConnection(source:string,target:string){
+        const inetCopy={...inetState};
+        let index=-1;
+        const sourceAgent=inetCopy.agents[source];
+        const targetAgent=inetCopy.agents[target]
+        if(sourceAgent && targetAgent ){
+            //if it is a principal link
+            if(sourceAgent.principalPort===target)
+                sourceAgent.principalPort=undefined;
+            else if((index=sourceAgent.auxiliaryPorts.findIndex(item=>target===item))>-1){
+                sourceAgent.auxiliaryPorts.splice(index,1);
+            }
+
+        }
+        setInetState(inetCopy);
+    }
+
     const value: WorkspaceContextProps = {
         currentTool: {
             toolID: currentTool,
@@ -163,7 +196,9 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
                 delete inetCopy.agents[id];
                 setInetState(inetCopy);
                 saveInetHistory();
-            }
+            },
+            connectAgent,
+            removeConnection
         },
         currentInetRules: {
             inetRules,

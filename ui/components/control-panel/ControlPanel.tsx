@@ -19,7 +19,10 @@ const ControlPanel = () => {
                     <Tabs.Tab value="settings" icon={<IconSettings size="0.8rem" />}>Settings</Tabs.Tab>
                 </Tabs.List>
 
-                <Tabs.Panel value="agents" pt="xs">
+                <Tabs.Panel value="agents" pt="xs" style={{
+                    overflowY:'auto',
+                    maxHeight:'80vh'
+                }}>
                     <Stack spacing='xs'>
                         {
                             Object.keys(inetState.agents).map(ak => (

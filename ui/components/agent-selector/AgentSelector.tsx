@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2 } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -10,7 +10,7 @@ const toolSetMenuData: { label: string, icon: ReactNode, type: ToolType }[] = [
    
     { label: 'Auxilary Link', icon: <IconLine />, type: 'AUX_LINK' },
     { label: 'Principal Link', icon: <IconArrowUpRightCircle />, type: 'PRINCIPAL_LINK' },
-    { label: 'Drag Node', icon: <IconCrosshair />, type: 'DRAG' }
+    { label: 'Drag Node', icon: <IconDragDrop2 />, type: 'DRAG' }
 ]
 
 const agentSetMenuData: { label: string, icon: ReactNode, type: AgentType }[]=[
@@ -27,6 +27,13 @@ const AgentSelector = () => {
 
     const {primaryColor}=useMantineTheme();
 
+
+    function handleOnClick(e:React.MouseEvent,selectedToolId:string){
+        e.stopPropagation();
+        e.preventDefault();
+        setCurrentTool(selectedToolId);
+    }
+
     return (
         <Card h='100%'>
             <Card.Section>
@@ -39,7 +46,7 @@ const AgentSelector = () => {
                         <Grid.Col span={6} key={menuItem.label}>
                             <Group position='center'>
                                 <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
-                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} onClick={() => setCurrentTool(menuItem.type)}>
+                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
                                         {menuItem.icon}
                                     </ActionIcon>
                                 </Tooltip>
@@ -58,7 +65,7 @@ const AgentSelector = () => {
                         <Grid.Col span={6} key={menuItem.label}>
                             <Group position='center'>
                                 <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
-                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} draggable onDragStart={console.log} onClick={() => setCurrentTool(menuItem.type)}>
+                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} draggable onDragStart={console.log} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
                                         {menuItem.icon}
                                     </ActionIcon>
                                 </Tooltip>
