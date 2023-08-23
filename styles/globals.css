@@ -8,17 +8,21 @@
   margin: 0;
   padding: 0;
 }
-.canvas-container{
+
+.canvas-container {
   height: 100%;
   width: 100%;
 }
-.canvas-controls{
+
+.canvas-controls {
   height: 5%;
-  
+
 }
-.canvas-spacing{
+
+.canvas-spacing {
   height: 1%;
 }
+
 .canvas {
   display: flex;
   justify-content: center;
@@ -51,7 +55,14 @@
   padding: 10px;
 }
 
-.node-thumbnail{
+;
+
+.node-highlighted:hover {
+  transform: scale(1.1);
+  background-color: white;
+}
+
+.node-thumbnail {
   position: relative;
   z-index: inherit;
 }
@@ -64,9 +75,10 @@
   border-radius: 10px;
 }
 
-.node-result{
+.node-result {
   border-radius: 10px;
 }
+
 .link {
   position: 'absolute';
   top: 0;
@@ -76,12 +88,12 @@
   z-index: 1;
 }
 
-.control-panel{
+.control-panel {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  
+
 }
 
 .draggable {

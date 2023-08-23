@@ -8,7 +8,7 @@ import NodeComponent from '../node-component/NodeComponent';
 import PrincipalLinkComponent from '../principal-link-component/PrincipalLinkComponent';
 
 const Canvas = () => {
-    const { inetState, moveNode, updateAgent, connectAgent } = useWorkspace().currentInetState;
+    const { inetState, moveNode, updateAgent, connectAgent,connectPrincipal } = useWorkspace().currentInetState;
 
     const { toolID } = useWorkspace().currentTool;
 
@@ -59,6 +59,15 @@ const Canvas = () => {
             }
 
         }
+        if (toolID === 'PRINCIPAL_LINK') {
+            if (!connectorSrc)
+                setconnectorSrc(agent.id)
+            else {
+                connectPrincipal(connectorSrc, agent.id);
+                setconnectorSrc('')
+            }
+
+        }
     }
 
     function handleMouseMove(e: MouseEvent) {
@@ -93,7 +102,7 @@ const Canvas = () => {
             >
                 {
                     Object.keys(inetState.agents).map(ak => (
-                        <NodeComponent key={ak} agent={inetState.agents[ak]} canvasRef={canvasRef} onMove={moveNode} dragDisabled={toolID !== 'DRAG'} onClick={handleOnNodeClick} />
+                        <NodeComponent key={ak} agent={inetState.agents[ak]} canvasRef={canvasRef} onMove={moveNode} dragDisabled={toolID !== 'DRAG'} onClick={handleOnNodeClick} enableHighlight={!!connectorSrc} />
                     ))
 
                 }

@@ -22,7 +22,8 @@ interface WorkspaceContextProps {
         updateAgent: (agent: Agent) => any,
         deleteAgent: (agentId: string) => any,
         connectAgent:(source:string,target:string)=>any,
-        removeConnection:(source:string,target:string)=>any
+        removeConnection:(source:string,target:string)=>any,
+        connectPrincipal:(source:string,target:string)=>any
     },
 
     currentInetRules: {
@@ -52,7 +53,8 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         updateAgent: () => { },
         deleteAgent: () => { },
         connectAgent:()=>{},
-        removeConnection:()=>{}
+        removeConnection:()=>{},
+        connectPrincipal:()=>{}
     },
     currentInetRules: {
         inetRules: [],
@@ -157,6 +159,15 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         setInetState(inetCopy);
     }
 
+    function connectPrincipal(source:string,target:string){
+        const inetCopy={...inetState};
+        const sourceAgent=inetCopy.agents[source];
+        const targetAgent=inetCopy.agents[target]
+        if(sourceAgent && targetAgent && targetAgent.type!=='NUMBER'){
+            sourceAgent.principalPort=target;
+        }
+    }
+
     const value: WorkspaceContextProps = {
         currentTool: {
             toolID: currentTool,
@@ -198,7 +209,8 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
                 saveInetHistory();
             },
             connectAgent,
-            removeConnection
+            removeConnection,
+            connectPrincipal
         },
         currentInetRules: {
             inetRules,
