@@ -1,6 +1,5 @@
-import { Card, Text, Divider, Tabs, Group, Stack, ActionIcon, Badge, ThemeIcon, Button, Modal, NumberInput, TextInput } from '@mantine/core'
-import { IconPhoto, IconVariable, IconSettings, IconCircle, IconTrash, IconPencil, IconAbc, IconCheck } from '@tabler/icons-react'
-import { isNumber } from 'lodash'
+import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Modal, NumberInput, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
+import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLine, IconPencil, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { Agent } from '../../../data/models/agent'
@@ -20,8 +19,8 @@ const ControlPanel = () => {
                 </Tabs.List>
 
                 <Tabs.Panel value="agents" pt="xs" style={{
-                    overflowY:'auto',
-                    maxHeight:'80vh'
+                    overflowY: 'auto',
+                    maxHeight: '80vh'
                 }}>
                     <Stack spacing='xs'>
                         {
@@ -47,14 +46,17 @@ interface AgentCardProps {
 
 const AgentCard = ({ agent }: AgentCardProps) => {
 
+    const [expand, setExpand] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [formData, setFormData] = useState<{ label: string, value: number }>({
         label: agent.label,
         value: agent.value
     })
 
+    const { inetState } = useWorkspace().currentInetState
 
-    const {updateAgent,deleteAgent}=useWorkspace().currentInetState;
+
+    const { updateAgent, deleteAgent } = useWorkspace().currentInetState;
 
     function handleOnEditClick(e: React.MouseEvent) {
         e.stopPropagation();
@@ -62,47 +64,65 @@ const AgentCard = ({ agent }: AgentCardProps) => {
         setEditModalOpen(true);
     }
 
-    
-    function handleSave(){
-        updateAgent({...agent,...formData})
+
+    function handleSave() {
+        updateAgent({ ...agent, ...formData })
         setEditModalOpen(false);
     }
 
 
-    
-    function handleDelete(){
+
+    function handleDelete() {
         deleteAgent(agent.id);
     }
 
     return (
         <>
             <Card p='xs' withBorder>
-                <Group position='apart'>
+                <Group position='apart' align='center'>
                     <Group>
                         <NodeComponent agent={agent} thumbnail dragDisabled />
                         <Stack spacing={0}>
-                            <Text size='sm' fw={500}>{agent.label} <Badge variant='outline' color={AgentColors[agent.type]} size='xs'>{agent.type}</Badge></Text>
-                            <Group>
-                                <ThemeIcon variant='light' size='sm'>
-                                    <IconVariable size={12} />
-                                </ThemeIcon>
-                            </Group>
+                            <Text size='md' fw={700}>{agent.label} <Badge variant='outline' color={AgentColors[agent.type]} size='xs'>{agent.type}</Badge></Text>
+                            <Text size='sm' color={useMantineTheme().primaryColor}>Value: {agent.value}</Text>
                         </Stack>
                     </Group>
-                    <Stack>
-                        <ActionIcon variant='filled' onClick={ handleOnEditClick}>
-                            <IconPencil size={18} />
-                        </ActionIcon>
-                        <ActionIcon variant='filled' color='red' >
-                            <IconTrash size={18} onClick={handleDelete}/>
-                        </ActionIcon>
-                    </Stack>
+                    <ActionIcon variant='filled' onClick={() => setExpand(!expand)}>
+                        {expand ? <IconArrowBadgeUpFilled size={18} /> : <IconArrowBadgeDownFilled size={18} />}
+                    </ActionIcon>
                 </Group>
+                <Collapse in={expand} transitionDuration={500}>
+                    <Divider my='xs' />
+                    <Stack spacing='xs'>
+                        <Group spacing='xs'>
+                            <ThemeIcon variant='filled' size='sm'>
+                                <IconArrowUpRightCircle size={12} />
+                            </ThemeIcon>
+                            <Text size='xs' fw={500}>Principal Port : {agent.principalPort ? inetState.agents[agent.principalPort].label : 'Not specified'}</Text>
+                        </Group>
+                        <Group spacing='xs' noWrap>
+                            <ThemeIcon variant='filled' size='sm'>
+                                <IconLine size={12} />
+                            </ThemeIcon>
+                            <Text size='xs' fw={500} truncate>Aux Ports : {agent.auxiliaryPorts.length>0 ? agent.auxiliaryPorts.map(id=>`${inetState.agents[id].label} (${inetState.agents[id].value})`).join(', ') : 'Not specified'}</Text>
+                        </Group>
+                        <Group position='right'>
+                            <ActionIcon variant='filled' onClick={handleOnEditClick}>
+                                <IconPencil size={18} />
+                            </ActionIcon>
+                            <ActionIcon variant='filled' color='red' >
+                                <IconTrash size={18} onClick={handleDelete} />
+                            </ActionIcon>
+
+                        </Group>
+                    </Stack>
+
+                </Collapse>
             </Card>
             <Modal opened={editModalOpen} onClose={() => setEditModalOpen(false)} title={`Edit Agent ${agent.label}`} size='xs' centered withCloseButton>
                 <Stack>
                     <Group align='center'>
-                        <div className={`node ${agent.type==='NUMBER'?'node-constant':'node-operator'} node-thumbnail`} id={agent.id} style={{ backgroundColor: AgentColors[agent.type] }}>
+                        <div className={`node ${agent.type === 'NUMBER' ? 'node-constant' : 'node-operator'} node-thumbnail`} id={agent.id} style={{ backgroundColor: AgentColors[agent.type] }}>
                             <Text size='sm' fw={500}>{formData.label}</Text>
                         </div>
                         <Stack spacing={0}>
