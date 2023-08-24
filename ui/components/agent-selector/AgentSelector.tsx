@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -14,12 +14,11 @@ const toolSetMenuData: { label: string, icon: ReactNode, type: ToolType }[] = [
 ]
 
 const agentSetMenuData: { label: string, icon: ReactNode, type: AgentType }[]=[
-    { label: 'Number Node', icon: <IconNumber1 />, type: 'NUMBER' },
+    { label: 'Number Node', icon: <IconCircleLetterN />, type: 'NUMBER' },
     { label: 'Addition Node', icon: <IconPlus />, type: 'ADD' },
     { label: 'Multiplication Node', icon: <IconX />, type: 'MUL' },
     { label: 'Subtraction Node', icon: <IconMinus />, type: 'SUB' },
     { label: 'Division Node', icon: <IconDivide />, type: 'DIV' },
-    { label: 'Sum All Node', icon: <IconSum />, type: 'SUM' },
 ]
 
 const AgentSelector = () => {

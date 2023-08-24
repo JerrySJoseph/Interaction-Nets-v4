@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { applyInteractionRules, generateAgent } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule, SumInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
 
 type InteractionNetState = {
     agents: AgentsDictionary,
@@ -104,7 +104,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
 
     useEffect(() => {
-        setInetRules([SumInteractionRule, AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
+        setInetRules([ AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
     }, []);
 
     useEffect(()=>{
@@ -125,11 +125,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         if (!sourceAgent)
             return;
 
-        console
-
-        if (sourceAgent.auxiliaryPorts.length >= sourceAgent.maxAllowedPorts)
-            throw new Error(`${sourceAgent.type} can only accept ${sourceAgent.maxAllowedPorts} auxiliary connections.`);
-
+      
         if (sourceAgent && sourceAgent.type !== 'NUMBER' && !sourceAgent.auxiliaryPorts.includes(target)) {
             sourceAgent.auxiliaryPorts.push(target);
         }
