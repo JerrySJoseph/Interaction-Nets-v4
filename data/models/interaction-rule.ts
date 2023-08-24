@@ -1,3 +1,4 @@
+import { generateTransformedAgent } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary, AgentType, NumberAgent, SumAgent } from "./agent"
 
 export type InteractionRule = {
@@ -25,10 +26,7 @@ export const AddInteractionRule: InteractionRule = {
             //if all the auxilary ports are deleted, replace the sum agent with a Number agent
             if(source.auxiliaryPorts.length===0){
                 console.log('replacing the node with number node')
-                const numberAgent:NumberAgent={
-                    ...source,
-                    type:'NUMBER'
-                }
+                const numberAgent:NumberAgent=generateTransformedAgent<NumberAgent>('NUMBER',source.value,source);
                 agents[source.id]=numberAgent;
             }
         }
@@ -52,10 +50,7 @@ export const MultiplicationInteractionRule: InteractionRule = {
             //if all the auxilary ports are deleted, replace the sum agent with a Number agent
             if(source.auxiliaryPorts.length===0){
                 console.log('replacing the node with number node')
-                const numberAgent:NumberAgent={
-                    ...source,
-                    type:'NUMBER'
-                }
+                const numberAgent:NumberAgent=generateTransformedAgent<NumberAgent>('NUMBER',source.value,source);
                 agents[source.id]=numberAgent;
             }
         }
@@ -79,10 +74,7 @@ export const SubtractInteractionRule: InteractionRule = {
             //if all the auxilary ports are deleted, replace the sum agent with a Number agent
             if(source.auxiliaryPorts.length===0){
                 console.log('replacing the node with number node')
-                const numberAgent:NumberAgent={
-                    ...source,
-                    type:'NUMBER'
-                }
+                const numberAgent:NumberAgent=generateTransformedAgent<NumberAgent>('NUMBER',source.value,source);
                 agents[source.id]=numberAgent;
             }
         }
@@ -109,21 +101,8 @@ export const DivideInteractionRule: InteractionRule = {
         //if all the auxilary ports are deleted, replace the sum agent with a Number agent
         if(source.auxiliaryPorts.length===0){
             console.log('replacing the node with number node')
-            const numberAgent:NumberAgent={
-                ...source,
-                type:'NUMBER'
-            }
+            const numberAgent:NumberAgent=generateTransformedAgent<NumberAgent>('NUMBER',source.value,source);
             agents[source.id]=numberAgent;
-        }
-    }
-}
-
-export const incrementInteractionRule: InteractionRule = {
-    sourceType: 'INC',
-    targetType: 'NUMBER',
-    action: (source, target) => {
-        if (source.type === 'INC' && target.type === 'NUMBER') {
-            const result = (target as NumberAgent).value + 1;
         }
     }
 }

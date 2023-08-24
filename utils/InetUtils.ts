@@ -58,8 +58,18 @@ export function generateAgent(type: AgentType, value: number = 0, x: number = ge
         x,
         y,
         type,
-        auxiliaryPorts: []
+        auxiliaryPorts: [],
+        transformationCount:0
     }
+}
+
+export function generateTransformedAgent<T>(type: AgentType, value: number = 0,oldAgent:Agent):T{
+    return {
+        ...oldAgent,
+        type,
+        value,
+        transformationCount:oldAgent.transformationCount+1
+    } as T;
 }
 
 export function generateConnections(agents: AgentsDictionary): Connection[] {

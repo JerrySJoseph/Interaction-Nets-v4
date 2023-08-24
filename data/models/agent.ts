@@ -8,7 +8,8 @@ export interface Agent{
     label:string,
     description?:string
     x:number,
-    y:number
+    y:number,
+    transformationCount:number
 }
 
 
