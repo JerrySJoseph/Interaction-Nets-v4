@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Card, Group, useMantineTheme } from '@mantine/core';
-import { IconArrowBackUp, IconArrowBigRightLines, IconArrowForwardUp, IconClearAll, IconX } from '@tabler/icons-react';
+import { IconArrowBackUp, IconArrowBigRightLines, IconArrowForwardUp, IconClearAll, IconDeviceFloppy, IconX } from '@tabler/icons-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from '../../../data/context/workspace-context';
 import { Agent, isAgentType } from '../../../data/models/agent';
@@ -48,7 +48,9 @@ const Canvas = () => {
         const x = e.clientX - rect.left - 20; // x position within the element
         const y = e.clientY - rect.top - 20;  // y position within the element
         if (isAgentType(toolID)) {
-            updateAgent(generateAgent(toolID, 0, x, y));
+            const newAgent=generateAgent(toolID, 0, x, y);
+            console.log('Agent generated',newAgent);
+            updateAgent(newAgent);
         }
         if (connectorSrc)
             setconnectorSrc('');
@@ -99,14 +101,7 @@ const Canvas = () => {
             <Card className='canvas-controls' withBorder p='xs'>
                 <Group position='apart'>
                     <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Reduce</Button>
-                    <Group>
-                        <ActionIcon variant='light' color={useMantineTheme().primaryColor} disabled={currentStateIndex>-1}>
-                            <IconArrowBackUp/>
-                        </ActionIcon>
-                        <ActionIcon variant='light' color={useMantineTheme().primaryColor} disabled={currentStateIndex<inetStates.length}>
-                            <IconArrowForwardUp/>
-                        </ActionIcon>
-                    </Group>
+                    <Button loading={reducing} onClick={reduce} leftIcon={<IconDeviceFloppy />}> Save to Library</Button>
                     <Button onClick={() => setInetState({ agents: {}, connections: [] })} color='red' leftIcon={<IconX />}> Clear</Button>
                 </Group>
             </Card>

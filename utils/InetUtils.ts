@@ -3,15 +3,19 @@ import { uniqueId } from "lodash";
 import { AgentsDictionary, Agent, AgentType } from "../data/models/agent";
 import { Connection } from "../data/models/connection";
 import { InteractionRule } from "../data/models/interaction-rule";
+import { InteractionNetState } from "../data/context/workspace-context";
 
-export async function applyInteractionRules(rules: InteractionRule[], agentsMap: AgentsDictionary) {
+export async function applyInteractionRules(rules: InteractionRule[], inetState:InteractionNetState) {
 
-    const agents = { ...agentsMap };
-    const steps: AgentsDictionary[] = [agents];
+    const agents = { ...inetState.agents };
+    const steps: InteractionNetState[] = [inetState];
 
     for (const agentId in agents) {
         const agent = agents[agentId];
-        console.log('Agent selected ', agent.id)
+        console.log('Agent selected ', agent.id);
+        if(agent.type==='NUMBER')
+            continue;
+
         rules.forEach(r => {
             console.log('rule selected', r.sourceType);
             if (r.sourceType === agent.type) {
@@ -23,6 +27,7 @@ export async function applyInteractionRules(rules: InteractionRule[], agentsMap:
                     if (target && r.targetType === target.type) {
                         console.log('Applying rule ', agent.label, target.label)
                         r.action(agent, target, agents);
+                        steps.push({...inetState});
                     }
                 })
             }
@@ -49,6 +54,19 @@ const MAX_ALLOWED_PORTS: {
     'NUMBER': 1
 }
 
+const ALLOWED_CONNECTIONS:{
+    [id:string]:AgentType[]
+}={
+    'ADD':['MUL'],
+    'SUB': [],
+    'MUL': [],
+    'DIV': [],
+    'SUM': [],
+    'INC':[],
+    'NUMBER': [],
+    'COUNT_AUX_PORT':[]
+}
+
 export function generateAgent(type: AgentType, value: number = 0, x: number = getRandomCordinate(), y: number = getRandomCordinate()): Agent {
     return {
         id: uniqueId(),
@@ -59,7 +77,8 @@ export function generateAgent(type: AgentType, value: number = 0, x: number = ge
         y,
         type,
         auxiliaryPorts: [],
-        transformationCount:0
+        transformationCount:0,
+        deniedAgents:ALLOWED_CONNECTIONS[type]
     }
 }
 

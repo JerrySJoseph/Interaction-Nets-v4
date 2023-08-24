@@ -5,7 +5,7 @@ import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
 import { AddInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
 
-type InteractionNetState = {
+export type InteractionNetState = {
     agents: AgentsDictionary,
     connections: Connection[]
 }
@@ -104,16 +104,16 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
 
     useEffect(() => {
-        setInetRules([ AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
+        setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(previousInetStates);
-    },[previousInetStates])
+    }, [previousInetStates])
 
 
     function performUndo() {
-        setInetState(previousInetStates[currentStateIndex-1]);
+        setInetState(previousInetStates[currentStateIndex - 1]);
     }
 
 
@@ -121,19 +121,29 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     function connectAgent(source: string, target: string) {
         const inetCopy = { ...inetState };
         const sourceAgent = inetCopy.agents[source];
+        const targetAgent = inetCopy.agents[target];
 
-        if (!sourceAgent)
+        //if not either of node exists
+        if (!sourceAgent || !targetAgent)
             return;
 
-      
-        if (sourceAgent && sourceAgent.type !== 'NUMBER' && !sourceAgent.auxiliaryPorts.includes(target)) {
-            sourceAgent.auxiliaryPorts.push(target);
-        }
+        // if source is a number type
+        if (sourceAgent.type === 'NUMBER')
+            throw new Error('Cannot connect Number as a source type to Any agent. Try connecting any other agent to Number');
 
-        if (sourceAgent && sourceAgent.type === 'NUMBER' && sourceAgent.principalPort !== target) {
-            sourceAgent.principalPort = target;
+        // connection already exists
+        if (sourceAgent.auxiliaryPorts.includes(target))
+            throw new Error('Connection already exists');;
+
+        // if target node doesn't allow this type of node connection
+        if (targetAgent.deniedAgents.length>0 && targetAgent.deniedAgents.includes(sourceAgent.type)){
+            throw new Error('Connection not allowed. '+targetAgent.type+' cannot accepts connections from '+targetAgent.deniedAgents.join(', '));
         }
+       
+        //save the connection if everything works out.
+        sourceAgent.auxiliaryPorts.push(target);
         setInetState(inetCopy);
+        
     }
 
     function removeConnection(source: string, target: string) {
@@ -166,11 +176,11 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         try {
 
             setReducing(true)
-            const { agents, steps } = await applyInteractionRules(inetRules, inetState.agents);
+            const { agents, steps } = await applyInteractionRules(inetRules, inetState);
 
             setInetState({ ...inetState, agents: { ...agents } });
-            setPreviousInetStates([...steps.map(s=>({agents:s,connections:[]}))]);
-            setCurrentStateIndex(steps.length-1)
+            setPreviousInetStates([...previousInetStates, ...steps])
+            setCurrentStateIndex(steps.length - 1)
 
         } catch (e) {
             alert(e)

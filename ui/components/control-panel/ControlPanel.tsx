@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Modal, Numbe
 import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLine, IconPencil, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
-import { Agent } from '../../../data/models/agent'
+import { Agent ,NumberAgent} from '../../../data/models/agent'
 import { AgentColors } from '../../../utils/theme'
 import NodeComponent from '../node-component/NodeComponent'
 
@@ -140,6 +140,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                                 placeholder="Eg: 590"
                                 label="Value of Agent"
                                 size="xs"
+                                disabled={agent.type!=='NUMBER' || !!(agent as NumberAgent).allowEdit}
                                 onChange={e => setFormData(prev => ({ ...prev, value: e || 0 }))}
                                 value={formData.value}
                                 withAsterisk

@@ -106,3 +106,12 @@ export const DivideInteractionRule: InteractionRule = {
         }
     }
 }
+
+
+export const CountAuxPortInteractionRule:InteractionRule={
+    sourceType: 'COUNT_AUX_PORT',
+    targetType: 'NUMBER',
+    action(source, target, agents) {
+        
+    },
+}
