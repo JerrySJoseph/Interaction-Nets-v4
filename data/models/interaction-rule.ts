@@ -7,22 +7,139 @@ export type InteractionRule = {
 }
 
 
-export const sumInteractionRule: InteractionRule = {
+export const SumInteractionRule: InteractionRule = {
     sourceType: 'SUM',
     targetType: 'NUMBER',
-    action: (source, target, agentsMap) => {
-        if (source.type === 'SUM' && target.type === 'NUMBER') {
-            const currentValue = (source as SumAgent).value;
-            const targetValue = (target as NumberAgent).value;
-            const result = currentValue + targetValue;
-            const newConnectionsList = source.auxiliaryPorts.filter(s => s === target.id);
-            const newSumAget: SumAgent = {
-                ...source,
-                type: "SUM",
-                value: result,
-                auxiliaryPorts: newConnectionsList,
+    action: (source, target, agents) => {
+        if (source.auxiliaryPorts.includes(target.id)) {
+            // Summing the value of the number agent to the sum agent
+            source.value += target.value;
+
+            // Removing the number agent from the auxiliary ports list
+            source.auxiliaryPorts = source.auxiliaryPorts.filter(id => id !== target.id);
+
+            // Removing the number agent from the dictionary (effectively "consuming" it)
+            delete agents[target.id];
+
+            //if all the auxilary ports are deleted, replace the sum agent with a Number agent
+            if(source.auxiliaryPorts.length===0){
+                console.log('replacing the node with number node')
+                const numberAgent:NumberAgent={
+                    ...source,
+                    type:'NUMBER'
+                }
+                agents[source.id]=numberAgent;
             }
-            agentsMap[source.id] = newSumAget;
+        }
+    }
+}
+export const AddInteractionRule: InteractionRule = {
+    sourceType: 'ADD',
+    targetType: 'NUMBER',
+    action: (source, target, agents) => {
+        if (source.auxiliaryPorts.includes(target.id)) {
+            // Summing the value of the number agent to the sum agent
+            source.value += target.value;
+            console.log('add value:',source.value,'[',target.value,'/',source.value,']');
+
+            // Removing the number agent from the auxiliary ports list
+            source.auxiliaryPorts = source.auxiliaryPorts.filter(id => id !== target.id);
+
+            // Removing the number agent from the dictionary (effectively "consuming" it)
+            delete agents[target.id];
+
+            //if all the auxilary ports are deleted, replace the sum agent with a Number agent
+            if(source.auxiliaryPorts.length===0){
+                console.log('replacing the node with number node')
+                const numberAgent:NumberAgent={
+                    ...source,
+                    type:'NUMBER'
+                }
+                agents[source.id]=numberAgent;
+            }
+        }
+    }
+}
+
+export const MultiplicationInteractionRule: InteractionRule = {
+    sourceType: 'MUL',
+    targetType: 'NUMBER',
+    action: (source, target, agents) => {
+        if (source.auxiliaryPorts.includes(target.id)) {
+            // Summing the value of the number agent to the sum agent
+            source.value *= target.value;
+            console.log('smul value:',source.value,'[',target.value,'/',source.value,']');
+            // Removing the number agent from the auxiliary ports list
+            source.auxiliaryPorts = source.auxiliaryPorts.filter(id => id !== target.id);
+
+            // Removing the number agent from the dictionary (effectively "consuming" it)
+            delete agents[target.id];
+
+            //if all the auxilary ports are deleted, replace the sum agent with a Number agent
+            if(source.auxiliaryPorts.length===0){
+                console.log('replacing the node with number node')
+                const numberAgent:NumberAgent={
+                    ...source,
+                    type:'NUMBER'
+                }
+                agents[source.id]=numberAgent;
+            }
+        }
+    }
+}
+
+export const SubtractInteractionRule: InteractionRule = {
+    sourceType: 'SUB',
+    targetType: 'NUMBER',
+    action: (source, target, agents) => {
+        if (source.auxiliaryPorts.includes(target.id)) {
+            // Summing the value of the number agent to the sum agent
+            source.value -= target.value;
+            console.log('sub value:',source.value,'[',target.value,'/',source.value,']');
+            // Removing the number agent from the auxiliary ports list
+            source.auxiliaryPorts = source.auxiliaryPorts.filter(id => id !== target.id);
+
+            // Removing the number agent from the dictionary (effectively "consuming" it)
+            delete agents[target.id];
+
+            //if all the auxilary ports are deleted, replace the sum agent with a Number agent
+            if(source.auxiliaryPorts.length===0){
+                console.log('replacing the node with number node')
+                const numberAgent:NumberAgent={
+                    ...source,
+                    type:'NUMBER'
+                }
+                agents[source.id]=numberAgent;
+            }
+        }
+    }
+}
+
+export const DivideInteractionRule: InteractionRule = {
+    sourceType: 'DIV',
+    targetType: 'NUMBER',
+    action: (source, target, agents) => {
+        // Summing the value of the number agent to the sum agent
+        if(source.value===0){
+            source.value=target.value;
+        }
+        else
+            source.value=source.value/target.value;
+      
+        // Removing the number agent from the auxiliary ports list
+        source.auxiliaryPorts = source.auxiliaryPorts.filter(id => id !== target.id);
+
+        // Removing the number agent from the dictionary (effectively "consuming" it)
+        delete agents[target.id];
+
+        //if all the auxilary ports are deleted, replace the sum agent with a Number agent
+        if(source.auxiliaryPorts.length===0){
+            console.log('replacing the node with number node')
+            const numberAgent:NumberAgent={
+                ...source,
+                type:'NUMBER'
+            }
+            agents[source.id]=numberAgent;
         }
     }
 }
@@ -30,7 +147,7 @@ export const sumInteractionRule: InteractionRule = {
 export const incrementInteractionRule: InteractionRule = {
     sourceType: 'INC',
     targetType: 'NUMBER',
-    action: (source, target, agentsMap) => {
+    action: (source, target) => {
         if (source.type === 'INC' && target.type === 'NUMBER') {
             const result = (target as NumberAgent).value + 1;
         }

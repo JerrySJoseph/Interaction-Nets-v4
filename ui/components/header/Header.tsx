@@ -3,7 +3,7 @@ import { ColorSchemeToggle } from '../colorschemetoggle/ColorSchemeToggle';
 
 type HeaderProps = Omit<MantineHeaderProps, 'children'> & {
     open: boolean
-    toggleOpen: () => any
+    toggleopen: () => any
 }
 
 const Header = (headerProps: HeaderProps) => {
@@ -19,7 +19,7 @@ const Header = (headerProps: HeaderProps) => {
                     <MediaQuery largerThan="lg" styles={{ display: 'none' }}>
                         <Burger
                             opened={headerProps.open}
-                            onClick={headerProps.toggleOpen}
+                            onClick={headerProps.toggleopen}
                             size="sm"
                             color={theme.colors.gray[6]}
                             mr="xl"

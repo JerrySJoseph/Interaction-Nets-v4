@@ -12,26 +12,28 @@
 .canvas-container {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: solid 1px white;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 .canvas-controls {
-  height: 5%;
+  height: auto;
 
-}
-
-.canvas-spacing {
-  height: 1%;
 }
 
 .canvas {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 94%;
+  height: auto;
   width: 100%;
   position: relative;
-  border: solid 1px white;
-  border-radius: 10px;
+  
+  
 }
 
 .level {
@@ -53,6 +55,7 @@
   justify-content: center;
   z-index: 2;
   padding: 10px;
+  aspect-ratio: 1/1;
 }
 
 ;
@@ -65,6 +68,8 @@
 .node-thumbnail {
   position: relative;
   z-index: inherit;
+  max-width: 50px;
+  max-height: 50px;
 }
 
 .node-constant {

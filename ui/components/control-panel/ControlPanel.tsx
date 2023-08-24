@@ -98,7 +98,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                             <ThemeIcon variant='filled' size='sm'>
                                 <IconArrowUpRightCircle size={12} />
                             </ThemeIcon>
-                            <Text size='xs' fw={500}>Principal Port : {agent.principalPort ? inetState.agents[agent.principalPort].label : 'Not specified'}</Text>
+                            <Text size='xs' fw={500}>Principal Port : {agent.principalPort && inetState.agents[agent.principalPort] ? inetState.agents[agent.principalPort].label : 'Not specified'}</Text>
                         </Group>
                         <Group spacing='xs' noWrap>
                             <ThemeIcon variant='filled' size='sm'>

@@ -40,7 +40,7 @@ const NodeComponent = (props: NodeComponentProps) => {
 
     if (thumbnail) {
         return <div className={`node ${getClass()} ${props.enableHighlight && 'node-highlighted'} node-thumbnail`} id={agent.id} style={{ backgroundColor: AgentColors[agent.type], borderColor: colorScheme === 'dark' ? 'white' : 'black' }}>
-            <Text size='sm' fw={500}>{agent.type === 'NUMBER' ? agent.value : agent.label}</Text>
+            <Text size='sm' fw={500} truncate>{agent.type === 'NUMBER' ? agent.value : agent.label}</Text>
         </div>
     }
 
@@ -59,7 +59,7 @@ const NodeComponent = (props: NodeComponentProps) => {
                 }} 
                 onClick={()=>onClick(agent)}
                 >
-                    <Text size='sm' fw={500}>{agent.type === 'NUMBER' ? agent.value : agent.label}</Text>
+                    <Text size='sm' fw={500} truncate>{agent.type === 'NUMBER' ? agent.value : `${agent.label}(${agent.value})`}</Text>
                 </div>
             </Draggable>
 

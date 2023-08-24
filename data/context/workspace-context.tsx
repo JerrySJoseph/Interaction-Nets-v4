@@ -1,9 +1,9 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { generateAgent } from "../../utils/InetUtils";
+import { applyInteractionRules, generateAgent } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { InteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule, SumInteractionRule } from "../models/interaction-rule";
 
 type InteractionNetState = {
     agents: AgentsDictionary,
@@ -21,9 +21,9 @@ interface WorkspaceContextProps {
         moveNode: (x: number, y: number, id: string) => any,
         updateAgent: (agent: Agent) => any,
         deleteAgent: (agentId: string) => any,
-        connectAgent:(source:string,target:string)=>any,
-        removeConnection:(source:string,target:string)=>any,
-        connectPrincipal:(source:string,target:string)=>any
+        connectAgent: (source: string, target: string) => any,
+        removeConnection: (source: string, target: string) => any,
+        connectPrincipal: (source: string, target: string) => any
     },
 
     currentInetRules: {
@@ -33,7 +33,12 @@ interface WorkspaceContextProps {
     history: {
         inetStates: InteractionNetState[],
         allowUndo: boolean,
-        performUndo: () => any
+        performUndo: () => any,
+        currentStateIndex: number
+    },
+    controls: {
+        reduce: () => any,
+        reducing: boolean
     }
 
 }
@@ -52,9 +57,9 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         moveNode: () => { },
         updateAgent: () => { },
         deleteAgent: () => { },
-        connectAgent:()=>{},
-        removeConnection:()=>{},
-        connectPrincipal:()=>{}
+        connectAgent: () => { },
+        removeConnection: () => { },
+        connectPrincipal: () => { }
     },
     currentInetRules: {
         inetRules: [],
@@ -63,7 +68,12 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
     history: {
         inetStates: [],
         allowUndo: true,
-        performUndo: () => { }
+        performUndo: () => { },
+        currentStateIndex: 0
+    },
+    controls: {
+        reduce: () => { },
+        reducing: false
     }
 }
 
@@ -77,6 +87,7 @@ interface WorkspaceContextProviderProps {
 
 export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderProps) => {
 
+    const [reducing, setReducing] = useState(false);
     const [currentTool, setCurrentTool] = useState<string>('DRAG');
     const [inetRules, setInetRules] = useState<InteractionRule[]>([]);
     const [inetState, setInetState] = useState<InteractionNetState>({
@@ -84,6 +95,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         connections: []
     })
     const [previousInetStates, setPreviousInetStates] = useState<InteractionNetState[]>([]);
+    const [currentStateIndex, setCurrentStateIndex] = useState(-1);
 
     const [connector, setConnector] = useState<{ source: string, target: string }>({
         source: '',
@@ -92,79 +104,82 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
 
     useEffect(() => {
-        const addAgent = generateAgent('ADD');
-        const subAgent = generateAgent('SUB');
-        const num1 = generateAgent('NUMBER', 98);
-        const num3 = generateAgent('NUMBER', 345);
-        const num4 = generateAgent('NUMBER', 234);
-        const num5 = generateAgent('NUMBER');
-
-        addAgent.auxiliaryPorts = [num1.id, num3.id, num4.id, num5.id]
-        addAgent.principalPort = subAgent.id
-
-
-
-        setInetState(prevState => ({
-            ...prevState,
-            agents: {
-                [addAgent.id]: addAgent,
-                [num1.id]: num1,
-                [num3.id]: num3,
-                [num4.id]: num4,
-                [num5.id]: num5,
-                [subAgent.id]: subAgent
-            }
-        }))
-        if (previousInetStates.length === 0)
-            saveInetHistory();
+        setInetRules([SumInteractionRule, AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
     }, []);
+
+    useEffect(()=>{
+        console.log(previousInetStates);
+    },[previousInetStates])
 
 
     function performUndo() {
-        setInetState(previousInetStates[previousInetStates.length - 1]);
-        previousInetStates.pop();
-        setPreviousInetStates(previousInetStates);
+        setInetState(previousInetStates[currentStateIndex-1]);
     }
 
-    function saveInetHistory() {
-        setPreviousInetStates([
-            ...previousInetStates,
-            inetState
-        ])
-    }
 
-    function connectAgent(source:string,target:string){
-        const inetCopy={...inetState};
-        const sourceAgent=inetCopy.agents[source];
-        if(sourceAgent && sourceAgent.type!=='NUMBER' && !sourceAgent.auxiliaryPorts.includes(target)){
+
+    function connectAgent(source: string, target: string) {
+        const inetCopy = { ...inetState };
+        const sourceAgent = inetCopy.agents[source];
+
+        if (!sourceAgent)
+            return;
+
+        console
+
+        if (sourceAgent.auxiliaryPorts.length >= sourceAgent.maxAllowedPorts)
+            throw new Error(`${sourceAgent.type} can only accept ${sourceAgent.maxAllowedPorts} auxiliary connections.`);
+
+        if (sourceAgent && sourceAgent.type !== 'NUMBER' && !sourceAgent.auxiliaryPorts.includes(target)) {
             sourceAgent.auxiliaryPorts.push(target);
+        }
+
+        if (sourceAgent && sourceAgent.type === 'NUMBER' && sourceAgent.principalPort !== target) {
+            sourceAgent.principalPort = target;
         }
         setInetState(inetCopy);
     }
 
-    function removeConnection(source:string,target:string){
-        const inetCopy={...inetState};
-        let index=-1;
-        const sourceAgent=inetCopy.agents[source];
-        const targetAgent=inetCopy.agents[target]
-        if(sourceAgent && targetAgent ){
+    function removeConnection(source: string, target: string) {
+        const inetCopy = { ...inetState };
+        let index = -1;
+        const sourceAgent = inetCopy.agents[source];
+        const targetAgent = inetCopy.agents[target]
+        if (sourceAgent && targetAgent) {
             //if it is a principal link
-            if(sourceAgent.principalPort===target)
-                sourceAgent.principalPort=undefined;
-            else if((index=sourceAgent.auxiliaryPorts.findIndex(item=>target===item))>-1){
-                sourceAgent.auxiliaryPorts.splice(index,1);
+            if (sourceAgent.principalPort === target)
+                sourceAgent.principalPort = undefined;
+            else if ((index = sourceAgent.auxiliaryPorts.findIndex(item => target === item)) > -1) {
+                sourceAgent.auxiliaryPorts.splice(index, 1);
             }
 
         }
         setInetState(inetCopy);
     }
 
-    function connectPrincipal(source:string,target:string){
-        const inetCopy={...inetState};
-        const sourceAgent=inetCopy.agents[source];
-        const targetAgent=inetCopy.agents[target]
-        if(sourceAgent && targetAgent && targetAgent.type!=='NUMBER'){
-            sourceAgent.principalPort=target;
+    function connectPrincipal(source: string, target: string) {
+        const inetCopy = { ...inetState };
+        const sourceAgent = inetCopy.agents[source];
+        const targetAgent = inetCopy.agents[target]
+        if (sourceAgent && targetAgent && targetAgent.type !== 'NUMBER') {
+            sourceAgent.principalPort = target;
+        }
+    }
+
+    async function reduce() {
+        try {
+
+            setReducing(true)
+            const { agents, steps } = await applyInteractionRules(inetRules, inetState.agents);
+
+            setInetState({ ...inetState, agents: { ...agents } });
+            setPreviousInetStates([...steps.map(s=>({agents:s,connections:[]}))]);
+            setCurrentStateIndex(steps.length-1)
+
+        } catch (e) {
+            alert(e)
+        } finally {
+            setReducing(false);
         }
     }
 
@@ -188,7 +203,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
                         }
                     }
                 }))
-                saveInetHistory();
+
             },
             updateAgent: (ag) => {
                 setInetState(prevState => ({
@@ -200,13 +215,13 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
                         }
                     }
                 }))
-                saveInetHistory();
+
             },
             deleteAgent: (id: string) => {
                 const inetCopy = { ...inetState };
                 delete inetCopy.agents[id];
                 setInetState(inetCopy);
-                saveInetHistory();
+
             },
             connectAgent,
             removeConnection,
@@ -219,7 +234,12 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         history: {
             inetStates: previousInetStates,
             allowUndo: true,
-            performUndo
+            performUndo,
+            currentStateIndex
+        },
+        controls: {
+            reduce,
+            reducing
         }
     };
 

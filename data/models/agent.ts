@@ -1,6 +1,7 @@
 export interface Agent{
     id: string,
     type: AgentType,
+    maxAllowedPorts:number
     principalPort?: string | null
     auxiliaryPorts: string[],
     value:number,

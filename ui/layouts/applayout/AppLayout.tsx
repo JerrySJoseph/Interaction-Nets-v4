@@ -25,7 +25,7 @@ const AppLayout2=({children}:AppLayoutProps)=>{
       //  <Footer height={60} p="md"/>
       // }
       header={
-        <Header height={{ base: 70, md: 70 }} p="md" open={opened} toggleOpen={()=>setOpened(!opened)}/>
+        <Header height={{ base: 70, md: 70 }} p="md" open={opened} toggleopen={()=>setOpened(!opened)}/>
       }
     >
       {children}

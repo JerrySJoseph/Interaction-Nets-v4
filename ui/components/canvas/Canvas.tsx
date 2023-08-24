@@ -1,4 +1,5 @@
-import { Card } from '@mantine/core';
+import { ActionIcon, Button, Card, Group, useMantineTheme } from '@mantine/core';
+import { IconArrowBackUp, IconArrowBigRightLines, IconArrowForwardUp, IconClearAll, IconX } from '@tabler/icons-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from '../../../data/context/workspace-context';
 import { Agent, isAgentType } from '../../../data/models/agent';
@@ -8,9 +9,13 @@ import NodeComponent from '../node-component/NodeComponent';
 import PrincipalLinkComponent from '../principal-link-component/PrincipalLinkComponent';
 
 const Canvas = () => {
-    const { inetState, moveNode, updateAgent, connectAgent,connectPrincipal } = useWorkspace().currentInetState;
+    const { inetState, moveNode, updateAgent, connectAgent, connectPrincipal, setInetState } = useWorkspace().currentInetState;
 
     const { toolID } = useWorkspace().currentTool;
+
+    const {performUndo,currentStateIndex,inetStates}=useWorkspace().history;
+
+    const { reduce, reducing } = useWorkspace().controls;
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +96,20 @@ const Canvas = () => {
 
     return (
         <div className="canvas-container">
-            <Card className='canvas-controls' withBorder><></></Card>
+            <Card className='canvas-controls' withBorder p='xs'>
+                <Group position='apart'>
+                    <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Reduce</Button>
+                    <Group>
+                        <ActionIcon variant='light' color={useMantineTheme().primaryColor} disabled={currentStateIndex>-1}>
+                            <IconArrowBackUp/>
+                        </ActionIcon>
+                        <ActionIcon variant='light' color={useMantineTheme().primaryColor} disabled={currentStateIndex<inetStates.length}>
+                            <IconArrowForwardUp/>
+                        </ActionIcon>
+                    </Group>
+                    <Button onClick={() => setInetState({ agents: {}, connections: [] })} color='red' leftIcon={<IconX />}> Clear</Button>
+                </Group>
+            </Card>
             <div className="canvas-spacing"></div>
             <div ref={canvasRef} className="canvas" onClick={handleOnClick}
 
