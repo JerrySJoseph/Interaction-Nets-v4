@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -13,12 +13,16 @@ const toolSetMenuData: { label: string, icon: ReactNode, type: ToolType }[] = [
     { label: 'Drag Node', icon: <IconHandMove />, type: 'DRAG' }
 ]
 
-const agentSetMenuData: { label: string, icon: ReactNode, type: AgentType }[]=[
+const arithmeticAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
     { label: 'Number Node', icon: <IconCircleLetterN />, type: 'NUMBER' },
     { label: 'Addition Node', icon: <IconPlus />, type: 'ADD' },
     { label: 'Multiplication Node', icon: <IconX />, type: 'MUL' },
     { label: 'Subtraction Node', icon: <IconMinus />, type: 'SUB' },
     { label: 'Division Node', icon: <IconDivide />, type: 'DIV' },
+]
+
+const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
+    { label: 'Comparator', icon: <IconCircleLetterC />, type: 'COMPARATOR' }
 ]
 
 const AgentSelector = () => {
@@ -56,12 +60,12 @@ const AgentSelector = () => {
                 }
             </Grid>
             <Card.Section>
-                <Title size='xs' p='xs' ta='center'>Base Agents</Title>
+                <Title size='xs' p='xs' ta='center'>Arithmetic</Title>
                 <Divider />
             </Card.Section>
             <Grid p='sm'>
                 {
-                    agentSetMenuData.map(menuItem => (
+                    arithmeticAgentData.map(menuItem => (
                         <Grid.Col span={6} key={menuItem.label}>
                             <Group position='center'>
                                 <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
