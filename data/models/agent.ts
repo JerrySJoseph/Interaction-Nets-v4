@@ -25,7 +25,7 @@ export interface IncrementAgent extends Agent{
     type: 'INC';    
 }
 
-export type AgentType='NUMBER'|'ADD'|'SUB'|'MUL'|'DIV'|'SUM'|'INC';
+export type AgentType='NUMBER'|'ADD'|'SUB'|'MUL'|'DIV'|'SUM'|'INC'|'COMPARATOR';
 
 export type AgentsDictionary = {
     [agentId: string]: Agent;

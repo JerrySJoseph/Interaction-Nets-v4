@@ -14,6 +14,7 @@ export const AgentColors={
     'DIV':'#F59F00',
     'SUM':'#F59F00',
     'INC':'#F59F00',
+    'COMPARATOR':'#F59F00'
 }
 
 export default customTheme

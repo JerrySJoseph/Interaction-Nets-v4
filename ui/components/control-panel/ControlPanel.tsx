@@ -104,7 +104,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                             <ThemeIcon variant='filled' size='sm'>
                                 <IconLine size={12} />
                             </ThemeIcon>
-                            <Text size='xs' fw={500} truncate>Aux Ports : {agent.auxiliaryPorts.length>0 ? agent.auxiliaryPorts.map(id=>`${inetState.agents[id].label} (${inetState.agents[id].value})`).join(', ') : 'Not specified'}</Text>
+                            <Text size='xs' fw={500} truncate>Aux Ports : {agent.auxiliaryPorts.length>0 ? agent.auxiliaryPorts.map(id=>`${inetState.agents[id] && inetState.agents[id].label} (${inetState.agents[id] && inetState.agents[id].value})`).join(', ') : 'Not specified'}</Text>
                         </Group>
                         <Group position='right'>
                             <ActionIcon variant='filled' onClick={handleOnEditClick}>
