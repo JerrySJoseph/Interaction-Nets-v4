@@ -1,14 +1,16 @@
-import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Modal, NumberInput, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
+import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
 import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLine, IconPencil, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
-import { Agent ,NumberAgent} from '../../../data/models/agent'
+import { Agent, NumberAgent } from '../../../data/models/agent'
 import { AgentColors } from '../../../utils/theme'
 import NodeComponent from '../node-component/NodeComponent'
 
 const ControlPanel = () => {
 
     const { inetState } = useWorkspace().currentInetState;
+
+    const {primaryColor}=useMantineTheme()
 
     return (
         <Card h='100%'>
@@ -27,6 +29,17 @@ const ControlPanel = () => {
                             Object.keys(inetState.agents).map(ak => (
                                 <AgentCard key={ak} agent={inetState.agents[ak]} />
                             ))
+                        }
+                        {
+                            Object.keys(inetState.agents).length===0 && 
+                            <>
+                            <Group position='center'>
+                                <Image src='/img/empty.svg' p='lg' maw='70%'/>
+                                
+                            </Group>
+                            <Text size='lg' fw={700} ta='center'>No Agents</Text>
+                            <Text size='xs' ta='center'>You have not added any agents yet. Please design an interaction in the canvas shown on the left side. All your agents will show up here.</Text>
+                            </>
                         }
                     </Stack>
                 </Tabs.Panel>
@@ -104,7 +117,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                             <ThemeIcon variant='filled' size='sm'>
                                 <IconLine size={12} />
                             </ThemeIcon>
-                            <Text size='xs' fw={500} truncate>Aux Ports : {agent.auxiliaryPorts.length>0 ? agent.auxiliaryPorts.map(id=>`${inetState.agents[id] && inetState.agents[id].label} (${inetState.agents[id] && inetState.agents[id].value})`).join(', ') : 'Not specified'}</Text>
+                            <Text size='xs' fw={500} truncate>Aux Ports : {agent.auxiliaryPorts.length > 0 ? agent.auxiliaryPorts.map(id => `${inetState.agents[id] && inetState.agents[id].label} (${inetState.agents[id] && inetState.agents[id].value})`).join(', ') : 'Not specified'}</Text>
                         </Group>
                         <Group position='right'>
                             <ActionIcon variant='filled' onClick={handleOnEditClick}>
@@ -135,17 +148,20 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                                 value={formData.label}
                                 icon={<IconAbc />}
                             />
-                            <NumberInput
-                                defaultValue={agent.value}
-                                placeholder="Eg: 590"
-                                label="Value of Agent"
-                                size="xs"
-                                disabled={agent.type!=='NUMBER' || !!(agent as NumberAgent).allowEdit}
-                                onChange={e => setFormData(prev => ({ ...prev, value: e || 0 }))}
-                                value={formData.value}
-                                withAsterisk
-                                hideControls
-                            />
+                            {
+                                agent.type === 'NUMBER' &&
+                                <NumberInput
+                                    defaultValue={agent.value}
+                                    placeholder="Eg: 590"
+                                    label="Value of Agent"
+                                    size="xs"
+                                    disabled={agent.type !== 'NUMBER' || !!(agent as NumberAgent).allowEdit}
+                                    onChange={e => setFormData(prev => ({ ...prev, value: e || 0 }))}
+                                    value={formData.value}
+                                    withAsterisk
+                                    hideControls
+                                />
+                            }
                         </Stack>
                     </Group>
                     <Divider />

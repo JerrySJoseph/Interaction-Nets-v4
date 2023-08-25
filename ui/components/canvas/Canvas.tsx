@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Card, Group, useMantineTheme } from '@mantine/core';
-import { IconArrowBackUp, IconArrowBigRightLines, IconArrowForwardUp, IconClearAll, IconDeviceFloppy, IconX } from '@tabler/icons-react';
+import { Alert, Button, Card, Group, Text } from '@mantine/core';
+import { IconArrowBigRightLines, IconX } from '@tabler/icons-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from '../../../data/context/workspace-context';
 import { Agent, isAgentType } from '../../../data/models/agent';
@@ -13,9 +13,7 @@ const Canvas = () => {
 
     const { toolID } = useWorkspace().currentTool;
 
-    const {performUndo,currentStateIndex,inetStates}=useWorkspace().history;
-
-    const { reduce, reducing } = useWorkspace().controls;
+    const { reduce, reducing, alert } = useWorkspace().controls;
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -48,8 +46,8 @@ const Canvas = () => {
         const x = e.clientX - rect.left - 20; // x position within the element
         const y = e.clientY - rect.top - 20;  // y position within the element
         if (isAgentType(toolID)) {
-            const newAgent=generateAgent(toolID, 0, x, y);
-            console.log('Agent generated',newAgent);
+            const newAgent = generateAgent(toolID, 0, x, y);
+            console.log('Agent generated', newAgent);
             updateAgent(newAgent);
         }
         if (connectorSrc)
@@ -101,7 +99,11 @@ const Canvas = () => {
             <Card className='canvas-controls' withBorder p='xs'>
                 <Group position='apart'>
                     <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Reduce</Button>
-                    <Button loading={reducing} onClick={reduce} leftIcon={<IconDeviceFloppy />}> Save to Library</Button>
+                    {
+                        alert && <Alert color={alert.color} m={0} p={5}>
+                            <Text size='xs'>{alert?.message}</Text>
+                        </Alert>
+                    }
                     <Button onClick={() => setInetState({ agents: {}, connections: [] })} color='red' leftIcon={<IconX />}> Clear</Button>
                 </Group>
             </Card>

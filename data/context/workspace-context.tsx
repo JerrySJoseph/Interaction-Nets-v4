@@ -1,14 +1,17 @@
 
+import { MantineColor } from "@mantine/core";
 import { createContext, useContext, useEffect, useState } from "react";
-import { applyInteractionRules, generateAgent } from "../../utils/InetUtils";
+import { applyInteractionRules } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, CountAuxPortInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
 
 export type InteractionNetState = {
     agents: AgentsDictionary,
     connections: Connection[]
 }
+
+export type AlertType={color:MantineColor,message:string}
 
 interface WorkspaceContextProps {
     currentTool: {
@@ -37,6 +40,7 @@ interface WorkspaceContextProps {
         currentStateIndex: number
     },
     controls: {
+        alert:AlertType|null
         reduce: () => any,
         reducing: boolean
     }
@@ -72,6 +76,7 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         currentStateIndex: 0
     },
     controls: {
+        alert:null,
         reduce: () => { },
         reducing: false
     }
@@ -96,15 +101,16 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     })
     const [previousInetStates, setPreviousInetStates] = useState<InteractionNetState[]>([]);
     const [currentStateIndex, setCurrentStateIndex] = useState(-1);
+    const [alert, setAlert] = useState<AlertType | null>(null);
 
-    const [connector, setConnector] = useState<{ source: string, target: string }>({
-        source: '',
-        target: ''
-    })
+    useEffect(()=>{
+        const timeout=setTimeout(()=>setAlert(null),3000);
+        return ()=>clearTimeout(timeout);
+    },[alert])
 
 
     useEffect(() => {
-        setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule])
+        setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,CountAuxPortInteractionRule])
     }, []);
 
     useEffect(() => {
@@ -127,23 +133,40 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         if (!sourceAgent || !targetAgent)
             return;
 
-        // if source is a number type
-        if (sourceAgent.type === 'NUMBER')
-            throw new Error('Cannot connect Number as a source type to Any agent. Try connecting any other agent to Number');
+        console.log(targetAgent);
 
-        // connection already exists
-        if (sourceAgent.auxiliaryPorts.includes(target))
-            throw new Error('Connection already exists');;
+        try {
 
-        // if target node doesn't allow this type of node connection
-        if (targetAgent.deniedAgents.length>0 && targetAgent.deniedAgents.includes(sourceAgent.type)){
-            throw new Error('Connection not allowed. '+targetAgent.type+' cannot accepts connections from '+targetAgent.deniedAgents.join(', '));
+            // if source is a number type
+            if (sourceAgent.type === 'NUMBER')
+                throw new Error('Cannot connect Number as a source type to Any agent. Try connecting any other agent to Number');
+
+            if(targetAgent.maxAllowedPorts<=targetAgent.auxiliaryPorts.length)
+                throw new Error(`${targetAgent.type} has reached max connections limit (${targetAgent.maxAllowedPorts}).`)
+
+            // connection already exists
+            if (sourceAgent.auxiliaryPorts.includes(target))
+                throw new Error('Connection already exists');
+
+            if(sourceAgent.type==='COUNT_AUX_PORT'){
+                throw new Error('COUNT Agent cannot be connected through aux ports to any other agents')
+            }
+
+            // if target node doesn't allow this type of node connection
+            if (targetAgent.deniedAgents.length > 0 && !targetAgent.deniedAgents.includes('ANY') &&targetAgent.deniedAgents.includes(sourceAgent.type)) {
+                throw new Error('Connection not allowed. ' + targetAgent.type + ' cannot accepts connections from ' + targetAgent.deniedAgents.join(', '));
+            }
+
+            //save the connection if everything works out.
+            sourceAgent.auxiliaryPorts.push(target);
+            setInetState(inetCopy);
+        } catch (error) {
+            setAlert({
+                color:'red',
+                message:(error as Error).message
+            })
         }
-       
-        //save the connection if everything works out.
-        sourceAgent.auxiliaryPorts.push(target);
-        setInetState(inetCopy);
-        
+
     }
 
     function removeConnection(source: string, target: string) {
@@ -164,12 +187,16 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     }
 
     function connectPrincipal(source: string, target: string) {
+        
         const inetCopy = { ...inetState };
         const sourceAgent = inetCopy.agents[source];
         const targetAgent = inetCopy.agents[target]
-        if (sourceAgent && targetAgent && targetAgent.type !== 'NUMBER') {
-            sourceAgent.principalPort = target;
-        }
+        
+        if (!sourceAgent || !targetAgent)
+            return;
+
+        sourceAgent.principalPort = target;
+        setInetState(inetCopy);
     }
 
     async function reduce() {
@@ -177,13 +204,15 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
             setReducing(true)
             const { agents, steps } = await applyInteractionRules(inetRules, inetState);
-
             setInetState({ ...inetState, agents: { ...agents } });
             setPreviousInetStates([...previousInetStates, ...steps])
             setCurrentStateIndex(steps.length - 1)
 
         } catch (e) {
-            alert(e)
+            setAlert({
+                color:'red',
+                message:(e as Error).message
+            })
         } finally {
             setReducing(false);
         }
@@ -244,12 +273,14 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             currentStateIndex
         },
         controls: {
+            alert,
             reduce,
             reducing
         }
     };
 
     return <WorkspaceContext.Provider value={value}>
+        
         {children}
     </WorkspaceContext.Provider>
 }

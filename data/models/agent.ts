@@ -10,7 +10,7 @@ export interface Agent {
     x: number,
     y: number,
     transformationCount: number,
-    deniedAgents:AgentType[]
+    deniedAgents: AgentType[]|string[]
 }
 
 export interface NumberAgent extends Agent {
@@ -27,22 +27,23 @@ export interface IncrementAgent extends Agent {
 }
 
 export interface BooleanAgent extends Agent {
-    type: 'COMPARATOR',
+    type: 'BOOL',
+    boolValue:boolean;
 }
 
-export type CountAuxPortAgent={
-    type:'COUNT_AUX_PORT'
+export type CountAuxPortAgent = {
+    type: 'COUNT_AUX_PORT'
 }
 
-export type AgentType = 'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'COMPARATOR'|'COUNT_AUX_PORT';
+export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS';
 
 export type AgentsDictionary = {
     [agentId: string]: Agent;
 }
 
 
-export type InteractionNetLibrary={
-    [label:string]:AgentsDictionary
+export type InteractionNetLibrary = {
+    [label: string]: AgentsDictionary
 }
 
 
@@ -55,6 +56,8 @@ export function isAgentType(variable: any): variable is AgentType {
         variable === 'MUL' ||
         variable === 'DIV' ||
         variable === 'SUM' ||
-        variable === 'INC'
+        variable === 'INC' ||
+        variable === 'BOOL' ||
+        variable === 'COUNT_AUX_PORT'
     );
 }

@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -22,7 +22,7 @@ const arithmeticAgentData: { label: string, icon: ReactNode, type: AgentType }[]
 ]
 
 const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
-    { label: 'Comparator', icon: <IconCircleLetterC />, type: 'COMPARATOR' }
+    { label: 'Count Aux ports', icon: <IconCircleLetterC />, type: 'COUNT_AUX_PORT' }
 ]
 
 const AgentSelector = () => {
@@ -69,7 +69,26 @@ const AgentSelector = () => {
                         <Grid.Col span={6} key={menuItem.label}>
                             <Group position='center'>
                                 <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
-                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} draggable onDragStart={console.log} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
+                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
+                                        {menuItem.icon}
+                                    </ActionIcon>
+                                </Tooltip>
+                            </Group>
+                        </Grid.Col>
+                    ))
+                }
+            </Grid>
+            <Card.Section>
+                <Title size='xs' p='xs' ta='center'>Logic</Title>
+                <Divider />
+            </Card.Section>
+            <Grid p='sm'>
+                {
+                    logicAgentData.map(menuItem => (
+                        <Grid.Col span={6} key={menuItem.label}>
+                            <Group position='center'>
+                                <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
+                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
                                         {menuItem.icon}
                                     </ActionIcon>
                                 </Tooltip>

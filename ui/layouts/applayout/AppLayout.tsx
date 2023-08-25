@@ -1,6 +1,7 @@
 import { AppShell, useMantineTheme } from '@mantine/core'
 import React, { useState } from 'react'
 import Header from '../../components/header/Header'
+import Footer from '../../components/footer/Footer'
 
 interface AppLayoutProps{    
     children?:React.ReactNode
@@ -21,9 +22,9 @@ const AppLayout2=({children}:AppLayoutProps)=>{
       
       navbarOffsetBreakpoint="lg"
       
-      // footer={
-      //  <Footer height={60} p="md"/>
-      // }
+      footer={
+       <Footer height={60} p="md"/>
+      }
       header={
         <Header height={{ base: 70, md: 70 }} p="md" open={opened} toggleopen={()=>setOpened(!opened)}/>
       }

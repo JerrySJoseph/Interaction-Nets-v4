@@ -5,7 +5,7 @@ import { Connection } from "../data/models/connection";
 import { InteractionRule } from "../data/models/interaction-rule";
 import { InteractionNetState } from "../data/context/workspace-context";
 
-export async function applyInteractionRules(rules: InteractionRule[], inetState:InteractionNetState) {
+export async function applyInteractionRules(rules: InteractionRule[], inetState: InteractionNetState) {
 
     const agents = { ...inetState.agents };
     const steps: InteractionNetState[] = [inetState];
@@ -13,7 +13,7 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
     for (const agentId in agents) {
         const agent = agents[agentId];
         console.log('Agent selected ', agent.id);
-        if(agent.type==='NUMBER')
+        if (agent.type === 'NUMBER')
             continue;
 
         rules.forEach(r => {
@@ -27,15 +27,27 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
                     if (target && r.targetType === target.type) {
                         console.log('Applying rule ', agent.label, target.label)
                         r.action(agent, target, agents);
-                        steps.push({...inetState});
+                        steps.push({ ...inetState });
                     }
                 })
             }
 
         });
 
+        const principalID=agent.principalPort;
+        const principalAgent=principalID?agents[principalID]:undefined;
+        if(principalAgent){
+            rules.forEach(r=>{
+                if(r.sourceType===agent.type && r.targetType===principalAgent.type && r.principalAction){
+                    r.principalAction(agent,principalAgent,agents);
+                    steps.push({...inetState});
+                }
+            })
+        }
+        
+
     };
-    return {agents,steps};
+    return { agents, steps };
 }
 
 function getRandomCordinate() {
@@ -45,49 +57,49 @@ function getRandomCordinate() {
 const MAX_ALLOWED_PORTS: {
     [id: string]: number
 } = {
-    'ADD': 2,
-    'SUB': 2,
-    'MUL': 2,
-    'DIV': 2,
+    'ADD': 100,
+    'SUB': 200,
+    'MUL': 200,
+    'DIV': 200,
     'SUM': 100,
     'INC': 1,
     'NUMBER': 1
 }
 
-const ALLOWED_CONNECTIONS:{
-    [id:string]:AgentType[]
-}={
-    'ADD':['MUL'],
+const DENIED_CONNECTIONS: {
+    [id: string]: AgentType[]|string[]
+} = {
+    'ADD': [],
     'SUB': [],
     'MUL': [],
     'DIV': [],
     'SUM': [],
-    'INC':[],
+    'INC': [],
     'NUMBER': [],
-    'COUNT_AUX_PORT':[]
+    'COUNT_AUX_PORT': ['ANY']
 }
 
 export function generateAgent(type: AgentType, value: number = 0, x: number = getRandomCordinate(), y: number = getRandomCordinate()): Agent {
     return {
         id: uniqueId(),
-        value: type === 'NUMBER' ? Math.floor(Math.random() * 100) : type==='MUL'?1:0,
+        value: value || type === 'NUMBER' ? Math.floor(Math.random() * 100) : type === 'MUL' ? 1 : 0,
         maxAllowedPorts: MAX_ALLOWED_PORTS[type] || 0,
-        label: type,
+        label: type.substring(0,6),
         x,
         y,
         type,
         auxiliaryPorts: [],
-        transformationCount:0,
-        deniedAgents:ALLOWED_CONNECTIONS[type]
+        transformationCount: 0,
+        deniedAgents: DENIED_CONNECTIONS[type]
     }
 }
 
-export function generateTransformedAgent<T>(type: AgentType, value: number = 0,oldAgent:Agent):T{
+export function generateTransformedAgent<T>(type: AgentType, value: number = 0, oldAgent: Agent): T {
     return {
         ...oldAgent,
         type,
         value,
-        transformationCount:oldAgent.transformationCount+1
+        transformationCount: oldAgent.transformationCount + 1
     } as T;
 }
 

@@ -16,7 +16,9 @@ export const AgentColors={
     'INC':'#F59F00',
     'COMPARATOR':'#F59F00',
     'COUNT_AUX_PORT':'#F59F00',
-    'ANY':'#F59F00'
+    'ANY':'#F59F00',
+    'BOOL':'#F59F00',
+    'EQUALS':'#F59F00',
 }
 
 export default customTheme

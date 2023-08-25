@@ -64,12 +64,14 @@ const NodeComponent = (props: NodeComponentProps) => {
 
                         backgroundColor: AgentColors[agent.type],
                         borderColor: colorScheme === 'dark' ? 'white' : 'black',
-                        cursor: toolID === 'DRAG' ? 'move' : ['AUX_LINK', 'PRINCIPAL_LINK'].includes(toolID) ? 'pointer' : 'default'
+                        cursor: toolID === 'DRAG' ? 'move' : ['AUX_LINK', 'PRINCIPAL_LINK'].includes(toolID) ? 'pointer' : 'default',
+                        color:'white'
 
                     }}
                         onClick={() => onClick(agent)}
                     >
-                        <Text size='sm' fw={500} truncate>{agent.type === 'NUMBER' ? agent.value : `${agent.label}(${agent.value})`}</Text>
+                        <Text size='sm' fw={700} truncate>{agent.type==='NUMBER'?agent.value:agent.label}</Text>
+                       
                     </div>
 
                 </Draggable>
