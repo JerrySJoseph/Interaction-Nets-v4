@@ -31,7 +31,7 @@ const NodeComponent = (props: NodeComponentProps) => {
     const { toolID } = useWorkspace().currentTool;
 
     const [visible, setVisible] = useState(false);
-    const [changeCount,setChangeCount]=useState(0);
+    const [changeCount, setChangeCount] = useState(0);
 
     useEffect(() => {
         setVisible(true);
@@ -41,6 +41,8 @@ const NodeComponent = (props: NodeComponentProps) => {
 
     const getClass = () => {
         if (agent.type === 'NUMBER')
+            return 'node-constant';
+        if (agent.type === 'BOOL')
             return 'node-constant';
         return 'node-operator';
     }
@@ -57,7 +59,7 @@ const NodeComponent = (props: NodeComponentProps) => {
 
     return (
         <>
-            <CSSTransition in={changeCount===agent.transformationCount} timeout={400} classNames="node" onEntered={() => setVisible(true)} onExited={() => setVisible(false)} mountOnEnter unmountOnExit>
+            <CSSTransition in={changeCount === agent.transformationCount} timeout={400} classNames="node" onEntered={() => setVisible(true)} onExited={() => setVisible(false)} mountOnEnter unmountOnExit>
                 <Draggable x={agent.x} y={agent.y} onDrag={(x, y) => debouncedOnMove(x, y, props.agent.id)} containerRef={props.canvasRef} dragDisabled={dragDisabled || thumbnail} >
 
                     <div className={`node ${getClass()} ${'node-highlighted'}`} id={agent.id} style={{
@@ -65,13 +67,13 @@ const NodeComponent = (props: NodeComponentProps) => {
                         backgroundColor: AgentColors[agent.type],
                         borderColor: colorScheme === 'dark' ? 'white' : 'black',
                         cursor: toolID === 'DRAG' ? 'move' : ['AUX_LINK', 'PRINCIPAL_LINK'].includes(toolID) ? 'pointer' : 'default',
-                        color:'white'
+                        color: 'white'
 
                     }}
                         onClick={() => onClick(agent)}
                     >
-                        <Text size='sm' fw={700} truncate>{agent.type==='NUMBER'?agent.value:agent.label}</Text>
-                       
+                        <Text size='sm' fw={700} truncate>{agent.type === 'NUMBER' ||agent.type === 'BOOL' ? agent.value.toString() : agent.label}</Text>
+
                     </div>
 
                 </Draggable>

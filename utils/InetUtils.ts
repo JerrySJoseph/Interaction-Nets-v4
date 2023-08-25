@@ -10,6 +10,7 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
     const agents = { ...inetState.agents };
     const steps: InteractionNetState[] = [inetState];
 
+
     for (const agentId in agents) {
         const agent = agents[agentId];
         console.log('Agent selected ', agent.id);
@@ -63,7 +64,13 @@ const MAX_ALLOWED_PORTS: {
     'DIV': 200,
     'SUM': 100,
     'INC': 1,
-    'NUMBER': 1
+    'NUMBER': 1,
+    'EQUALS':2,
+    'NOT_EQUALS':2,
+    'LESS_THAN':2,
+    'GREATER_THAN':2,
+    'LESS_THAN_EQUALS':2,
+    'GREATER_THAN_EQUALS':2
 }
 
 const DENIED_CONNECTIONS: {
@@ -94,12 +101,13 @@ export function generateAgent(type: AgentType, value: number = 0, x: number = ge
     }
 }
 
-export function generateTransformedAgent<T>(type: AgentType, value: number = 0, oldAgent: Agent): T {
+export function generateTransformedAgent<T extends Agent>(type: AgentType, value: number|boolean =0, oldAgent: Agent): T {
     return {
         ...oldAgent,
         type,
         value,
-        transformationCount: oldAgent.transformationCount + 1
+        transformationCount: oldAgent.transformationCount + 1,
+        label:'Result'
     } as T;
 }
 

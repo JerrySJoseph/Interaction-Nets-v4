@@ -4,14 +4,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { applyInteractionRules } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, CountAuxPortInteractionRule, DivideInteractionRule, InteractionRule, MultiplicationInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, CountAuxPortInteractionRule, DivideInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
 
 export type InteractionNetState = {
     agents: AgentsDictionary,
     connections: Connection[]
 }
 
-export type AlertType={color:MantineColor,message:string}
+export type AlertType = { color: MantineColor, message: string }
 
 interface WorkspaceContextProps {
     currentTool: {
@@ -40,7 +40,7 @@ interface WorkspaceContextProps {
         currentStateIndex: number
     },
     controls: {
-        alert:AlertType|null
+        alert: AlertType | null
         reduce: () => any,
         reducing: boolean
     }
@@ -76,7 +76,7 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         currentStateIndex: 0
     },
     controls: {
-        alert:null,
+        alert: null,
         reduce: () => { },
         reducing: false
     }
@@ -103,14 +103,16 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     const [currentStateIndex, setCurrentStateIndex] = useState(-1);
     const [alert, setAlert] = useState<AlertType | null>(null);
 
-    useEffect(()=>{
-        const timeout=setTimeout(()=>setAlert(null),3000);
-        return ()=>clearTimeout(timeout);
-    },[alert])
+    useEffect(() => {
+        const timeout = setTimeout(() => setAlert(null), 3000);
+        return () => clearTimeout(timeout);
+    }, [alert])
 
 
     useEffect(() => {
-        setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,CountAuxPortInteractionRule])
+        setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,
+            CountAuxPortInteractionRule, EqualsInteractionRule, NotEqualsInteractionRule, LessThanEqualsInteractionRule, GreaterTHanEqualsInteractionRule,
+            LessThanInteractionRule, GreaterTHanEqualsInteractionRule])
     }, []);
 
     useEffect(() => {
@@ -141,19 +143,19 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             if (sourceAgent.type === 'NUMBER')
                 throw new Error('Cannot connect Number as a source type to Any agent. Try connecting any other agent to Number');
 
-            if(targetAgent.maxAllowedPorts<=targetAgent.auxiliaryPorts.length)
-                throw new Error(`${targetAgent.type} has reached max connections limit (${targetAgent.maxAllowedPorts}).`)
+            if (sourceAgent.maxAllowedPorts <= sourceAgent.auxiliaryPorts.length)
+                throw new Error(`${sourceAgent.type} has reached max connections limit (${sourceAgent.maxAllowedPorts}).`)
 
             // connection already exists
             if (sourceAgent.auxiliaryPorts.includes(target))
                 throw new Error('Connection already exists');
 
-            if(sourceAgent.type==='COUNT_AUX_PORT'){
+            if (sourceAgent.type === 'COUNT_AUX_PORT') {
                 throw new Error('COUNT Agent cannot be connected through aux ports to any other agents')
             }
 
             // if target node doesn't allow this type of node connection
-            if (targetAgent.deniedAgents.length > 0 && !targetAgent.deniedAgents.includes('ANY') &&targetAgent.deniedAgents.includes(sourceAgent.type)) {
+            if (targetAgent.deniedAgents.length > 0 && !targetAgent.deniedAgents.includes('ANY') && targetAgent.deniedAgents.includes(sourceAgent.type)) {
                 throw new Error('Connection not allowed. ' + targetAgent.type + ' cannot accepts connections from ' + targetAgent.deniedAgents.join(', '));
             }
 
@@ -162,8 +164,8 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             setInetState(inetCopy);
         } catch (error) {
             setAlert({
-                color:'red',
-                message:(error as Error).message
+                color: 'red',
+                message: (error as Error).message
             })
         }
 
@@ -187,11 +189,11 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     }
 
     function connectPrincipal(source: string, target: string) {
-        
+
         const inetCopy = { ...inetState };
         const sourceAgent = inetCopy.agents[source];
         const targetAgent = inetCopy.agents[target]
-        
+
         if (!sourceAgent || !targetAgent)
             return;
 
@@ -210,8 +212,8 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
         } catch (e) {
             setAlert({
-                color:'red',
-                message:(e as Error).message
+                color: 'red',
+                message: (e as Error).message
             })
         } finally {
             setReducing(false);
@@ -280,7 +282,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     };
 
     return <WorkspaceContext.Provider value={value}>
-        
+
         {children}
     </WorkspaceContext.Provider>
 }

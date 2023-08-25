@@ -1,8 +1,8 @@
-import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
+import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Select, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
 import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLine, IconPencil, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
-import { Agent, NumberAgent } from '../../../data/models/agent'
+import { Agent, BooleanAgent, NumberAgent } from '../../../data/models/agent'
 import { AgentColors } from '../../../utils/theme'
 import NodeComponent from '../node-component/NodeComponent'
 
@@ -10,7 +10,7 @@ const ControlPanel = () => {
 
     const { inetState } = useWorkspace().currentInetState;
 
-    const {primaryColor}=useMantineTheme()
+    const { primaryColor } = useMantineTheme()
 
     return (
         <Card h='100%'>
@@ -31,14 +31,14 @@ const ControlPanel = () => {
                             ))
                         }
                         {
-                            Object.keys(inetState.agents).length===0 && 
+                            Object.keys(inetState.agents).length === 0 &&
                             <>
-                            <Group position='center'>
-                                <Image src='/img/empty.svg' p='lg' maw='70%'/>
-                                
-                            </Group>
-                            <Text size='lg' fw={700} ta='center'>No Agents</Text>
-                            <Text size='xs' ta='center'>You have not added any agents yet. Please design an interaction in the canvas shown on the left side. All your agents will show up here.</Text>
+                                <Group position='center'>
+                                    <Image src='/img/empty.svg' p='lg' maw='70%' />
+
+                                </Group>
+                                <Text size='lg' fw={700} ta='center'>No Agents</Text>
+                                <Text size='xs' ta='center'>You have not added any agents yet. Please design an interaction in the canvas shown on the left side. All your agents will show up here.</Text>
                             </>
                         }
                     </Stack>
@@ -61,9 +61,10 @@ const AgentCard = ({ agent }: AgentCardProps) => {
 
     const [expand, setExpand] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [formData, setFormData] = useState<{ label: string, value: number }>({
+    const [formData, setFormData] = useState<{ label: string, value: number,boolValue?:boolean }>({
         label: agent.label,
-        value: agent.value
+        value: agent.value,
+        boolValue:(agent as BooleanAgent).boolValue || false
     })
 
     const { inetState } = useWorkspace().currentInetState
@@ -97,7 +98,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                         <NodeComponent agent={agent} thumbnail dragDisabled />
                         <Stack spacing={0}>
                             <Text size='md' fw={700}>{agent.label} <Badge variant='outline' color={AgentColors[agent.type]} size='xs'>{agent.type}</Badge></Text>
-                            <Text size='sm' color={useMantineTheme().primaryColor}>Value: {agent.value}</Text>
+                            <Text size='sm' color={useMantineTheme().primaryColor}>Value: {agent.type==='BOOL'?(agent as BooleanAgent).boolValue.toString():agent.value}</Text>
                         </Stack>
                     </Group>
                     <ActionIcon variant='filled' onClick={() => setExpand(!expand)}>
@@ -155,11 +156,25 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                                     placeholder="Eg: 590"
                                     label="Value of Agent"
                                     size="xs"
-                                    disabled={agent.type !== 'NUMBER' || !!(agent as NumberAgent).allowEdit}
+                                    disabled={!!(agent as NumberAgent).allowEdit}
                                     onChange={e => setFormData(prev => ({ ...prev, value: e || 0 }))}
                                     value={formData.value}
                                     withAsterisk
                                     hideControls
+                                />
+                            }
+                            {
+                                agent.type === 'BOOL' &&
+                                <Select
+                                    defaultValue={formData.boolValue? 'TRUE' : "FALSE"}
+                                    placeholder="Eg: TRUE"
+                                    label="Boolean Value of Agent"
+                                    size="xs"
+                                    disabled={!!(agent as NumberAgent).allowEdit}
+                                    data={[{ label: 'TRUE', value: 'true' }, { label: 'FALSE', value: 'false' }]}
+                                    onChange={e => setFormData(prev => ({ ...prev, boolValue:e==='true'}))}
+                                    value={formData.boolValue?'true':'false'}
+                                    withAsterisk
                                 />
                             }
                         </Stack>

@@ -31,11 +31,23 @@ export interface BooleanAgent extends Agent {
     boolValue:boolean;
 }
 
+export interface EqualsAgent extends Agent {
+    type: 'BOOL',
+    boolValue:boolean;
+}
+export interface NotEqualsAgent extends Agent {
+    type: 'NOT_EQUALS',
+    boolValue:boolean;
+}
+
 export type CountAuxPortAgent = {
     type: 'COUNT_AUX_PORT'
 }
 
-export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS';
+export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS'|'NOT_EQUALS'|
+'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS';
+
+
 
 export type AgentsDictionary = {
     [agentId: string]: Agent;
@@ -58,6 +70,13 @@ export function isAgentType(variable: any): variable is AgentType {
         variable === 'SUM' ||
         variable === 'INC' ||
         variable === 'BOOL' ||
-        variable === 'COUNT_AUX_PORT'
+        variable === 'COUNT_AUX_PORT'||
+        variable === 'EQUALS' ||
+        variable === 'NOT_EQUALS' ||
+        variable === 'LESS_THAN_EQUALS' ||
+        variable === 'GREATER_THAN_EQUALS' ||
+        variable === 'LESS_THAN' ||
+        variable === 'GREATER_THAN'
+        
     );
 }

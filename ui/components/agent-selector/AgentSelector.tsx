@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers, IconEqual, IconEqualNot, IconMathEqualLower, IconMathEqualGreater, IconMathGreater, IconMathLower } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -22,7 +22,13 @@ const arithmeticAgentData: { label: string, icon: ReactNode, type: AgentType }[]
 ]
 
 const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
-    { label: 'Count Aux ports', icon: <IconCircleLetterC />, type: 'COUNT_AUX_PORT' }
+   
+    { label: 'Equals', icon: <IconEqual />, type: 'EQUALS' },
+    { label: 'Not Equals', icon: <IconEqualNot />, type: 'NOT_EQUALS' },
+    { label: 'Less Than Equals', icon: <IconMathEqualLower />, type: 'LESS_THAN_EQUALS' },
+    { label: 'Greater than equals', icon: <IconMathEqualGreater/>, type: 'GREATER_THAN_EQUALS' },
+    { label: 'Less Than', icon: <IconMathLower />, type: 'LESS_THAN' },
+    { label: 'Greater Than', icon: <IconMathGreater />, type: 'GREATER_THAN' }
 ]
 
 const AgentSelector = () => {
