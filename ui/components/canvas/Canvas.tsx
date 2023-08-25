@@ -125,12 +125,12 @@ const Canvas = () => {
                     Object.keys(inetState.agents).map(ak => (
                         <>
                             {
-                                inetState.agents[ak].auxiliaryPorts.map(lk => {
+                                inetState.agents[ak].auxiliaryPorts.map((lk, i) => {
                                     const source = inetState.agents[ak];
                                     const target = inetState.agents[lk];
                                     if (!source || !target)
                                         return <></>
-                                    return <LinkComponent key={`${ak}-${lk}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} source={source.id} target={target.id} />
+                                    return <LinkComponent key={`${ak}-${lk}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} source={source.id} target={target.id} index={i + 1} />
                                 })
                             }
                             {(target = inetState.agents[ak].principalPort) && inetState.agents[target] &&
