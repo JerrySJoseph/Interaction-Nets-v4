@@ -1,5 +1,5 @@
 import { Avatar, Burger, Group, Header as MantineHeader, HeaderProps as MantineHeaderProps, MediaQuery, Text, useMantineTheme } from '@mantine/core';
-import { ColorSchemeToggle } from '../colorschemetoggle/ColorSchemeToggle';
+
 
 type HeaderProps = Omit<MantineHeaderProps, 'children'> & {
     open: boolean
@@ -10,7 +10,7 @@ const Header = (headerProps: HeaderProps) => {
 
     const theme = useMantineTheme()
 
-      
+
 
     return (
         <MantineHeader {...headerProps}>
@@ -31,8 +31,8 @@ const Header = (headerProps: HeaderProps) => {
                         <Text size='xl' fw='bold'>Interaction Nets</Text>
                     </Group>
 
-                                      
-                    <ColorSchemeToggle/>
+
+
 
                 </Group>
             </MediaQuery>

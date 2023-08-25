@@ -3,7 +3,8 @@ import { MantineThemeOverride } from "@mantine/core";
 const customTheme:MantineThemeOverride={
     defaultRadius:'md',
     primaryColor:'yellow',
-    primaryShade:7,    
+    primaryShade:7,
+    colorScheme:'dark'    
 }
 
 export const AgentColors={
