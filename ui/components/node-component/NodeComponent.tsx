@@ -1,13 +1,11 @@
-import { Button, Divider, Group, Modal, NumberInput, Stack, Text, TextInput, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import { Text, useMantineColorScheme } from '@mantine/core';
 import { debounce } from 'lodash';
-import React, { Ref, RefObject, useEffect, useState } from 'react';
-import { Agent } from '../../../data/models/agent';
-import Draggable from '../Draggable/Draggable';
-import { IconCheck, IconTrash, IconAbc } from '@tabler/icons-react'
+import { RefObject, useEffect, useState } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import { useWorkspace } from '../../../data/context/workspace-context';
+import { Agent } from '../../../data/models/agent';
 import { AgentColors } from '../../../utils/theme';
-import { CSSTransition } from 'react-transition-group'
-import { useTimeout } from 'usehooks-ts';
+import Draggable from '../Draggable/Draggable';
 
 interface NodeComponentProps {
     agent: Agent,
