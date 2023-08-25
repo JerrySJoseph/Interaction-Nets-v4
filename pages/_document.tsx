@@ -9,7 +9,10 @@ export default class _Document extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head>
+          <title>Interaction Nets</title>
+          <link rel="shortcut icon" href="favicon.ico" />
+        </Head>
         <body>
           <Main />
           <NextScript />
