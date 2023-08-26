@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { applyInteractionRules } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, CountAuxPortInteractionRule, DivideInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, DivideInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule, SuccessorInteractionRule } from "../models/interaction-rule";
 
 export type InteractionNetState = {
     agents: AgentsDictionary,
@@ -111,13 +111,12 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
     useEffect(() => {
         setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,
-            CountAuxPortInteractionRule, EqualsInteractionRule, NotEqualsInteractionRule, LessThanEqualsInteractionRule, GreaterTHanEqualsInteractionRule,
-            LessThanInteractionRule, GreaterTHanEqualsInteractionRule])
+             EqualsInteractionRule, NotEqualsInteractionRule, LessThanEqualsInteractionRule, GreaterTHanEqualsInteractionRule,
+            LessThanInteractionRule, GreaterTHanEqualsInteractionRule,
+            SuccessorInteractionRule])
     }, []);
 
-    useEffect(() => {
-        console.log(previousInetStates);
-    }, [previousInetStates])
+  
 
 
     function performUndo() {
@@ -128,8 +127,8 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
     function connectAgent(source: string, target: string) {
         const inetCopy = { ...inetState };
-        const sourceAgent  = inetCopy.agents[source];
-        const targetAgent  = inetCopy.agents[target];
+        const sourceAgent = inetCopy.agents[source];
+        const targetAgent = inetCopy.agents[target];
 
         //if not either of node exists
         if (!targetAgent || !sourceAgent)
@@ -142,8 +141,8 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             if (targetAgent.type === 'NUMBER')
                 throw new Error('Cannot connect Number as a target type to Any agent. Try connecting any other Number to this agent');
 
-            if (targetAgent.maxAllowedPorts <= targetAgent.auxiliaryPorts.length)
-                throw new Error(`${targetAgent.type} has reached max connections limit (${targetAgent.maxAllowedPorts}).`)
+            if (targetAgent.arity-1 <= targetAgent.auxiliaryPorts.length)
+                throw new Error(`${targetAgent.type} has reached max arity limit (${targetAgent.arity-1}).`)
 
             // connection already exists
             if (targetAgent.auxiliaryPorts.includes(target))
@@ -160,8 +159,10 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
             //save the connection if everything works out.
             targetAgent.auxiliaryPorts.push(source);
+           console.log(targetAgent);
             setInetState(inetCopy);
         } catch (error) {
+           // throw error;
             setAlert({
                 color: 'red',
                 message: (error as Error).message

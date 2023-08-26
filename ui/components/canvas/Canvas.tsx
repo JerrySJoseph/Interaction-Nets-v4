@@ -26,7 +26,7 @@ const Canvas = () => {
     useEffect(() => {
         if (canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();
-            console.log(rect);
+           
         }
     }, [canvasRef]);
 
@@ -47,7 +47,7 @@ const Canvas = () => {
         const y = e.clientY - rect.top - 20;  // y position within the element
         if (isAgentType(toolID)) {
             const newAgent = generateAgent(toolID, 0, x, y);
-            console.log('Agent generated', newAgent);
+         
             updateAgent(newAgent);
         }
         if (connectorSrc)

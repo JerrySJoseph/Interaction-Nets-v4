@@ -73,11 +73,12 @@
 }
 
 .node-constant {
-  border-radius: 50%;
+  border-radius: 10px;
+  
 }
 
 .node-operator {
-  border-radius: 10px;
+  border-radius: 50%;
 }
 
 .node-result {

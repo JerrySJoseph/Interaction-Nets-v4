@@ -17,6 +17,18 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
         if (agent.type === 'NUMBER')
             continue;
 
+
+        const principalID = agent.principalPort;
+        const principalAgent = principalID ? agents[principalID] : undefined;
+        if (principalAgent) {
+            rules.forEach(r => {
+                if (r.sourceType === agent.type && r.targetType === principalAgent.type && r.principalAction) {
+                    r.principalAction(agent, principalAgent, agents);
+                    steps.push({ ...inetState });
+                }
+            })
+        }
+
         rules.forEach(r => {
             console.log('rule selected', r.sourceType);
             if (r.sourceType === agent.type) {
@@ -35,17 +47,8 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
         });
 
-        const principalID=agent.principalPort;
-        const principalAgent=principalID?agents[principalID]:undefined;
-        if(principalAgent){
-            rules.forEach(r=>{
-                if(r.sourceType===agent.type && r.targetType===principalAgent.type && r.principalAction){
-                    r.principalAction(agent,principalAgent,agents);
-                    steps.push({...inetState});
-                }
-            })
-        }
-        
+
+
 
     };
     return { agents, steps };
@@ -58,23 +61,38 @@ function getRandomCordinate() {
 const MAX_ALLOWED_PORTS: {
     [id: string]: number
 } = {
-    'ADD': 100,
-    'SUB': 200,
-    'MUL': 200,
-    'DIV': 200,
-    'SUM': 100,
+    'ADD': 2,
+    'SUB': 2,
+    'MUL': 2,
+    'DIV': 2,
+    'SUCC': 1,
     'INC': 1,
     'NUMBER': 1,
-    'EQUALS':2,
-    'NOT_EQUALS':2,
-    'LESS_THAN':2,
-    'GREATER_THAN':2,
-    'LESS_THAN_EQUALS':2,
-    'GREATER_THAN_EQUALS':2
+    'EQUALS': 2,
+    'NOT_EQUALS': 2,
+    'LESS_THAN': 2,
+    'GREATER_THAN': 2,
+    'LESS_THAN_EQUALS': 2,
+    'GREATER_THAN_EQUALS': 2
 }
-
+const SYMBOLS: {
+    [id: string]: string
+} = {
+    'ADD': '+',
+    'SUB': '-',
+    'MUL': '*',
+    'DIV': '/',
+    'SUCC': 'S',
+    'NUMBER': 'N',
+    'EQUALS': '=',
+    'NOT_EQUALS': '!=',
+    'LESS_THAN': '<',
+    'GREATER_THAN': '>',
+    'LESS_THAN_EQUALS': '<=',
+    'GREATER_THAN_EQUALS': '>='
+}
 const DENIED_CONNECTIONS: {
-    [id: string]: AgentType[]|string[]
+    [id: string]: AgentType[] | string[]
 } = {
     'ADD': [],
     'SUB': [],
@@ -90,24 +108,25 @@ export function generateAgent(type: AgentType, value: number = 0, x: number = ge
     return {
         id: uniqueId(),
         value: value || type === 'NUMBER' ? Math.floor(Math.random() * 100) : type === 'MUL' ? 1 : 0,
-        maxAllowedPorts: MAX_ALLOWED_PORTS[type] || 0,
-        label: type.substring(0,6),
+        arity: MAX_ALLOWED_PORTS[type] || 0,
+        label: type.substring(0, 6),
         x,
         y,
         type,
+        symbol: SYMBOLS[type],
         auxiliaryPorts: [],
         transformationCount: 0,
-        deniedAgents: DENIED_CONNECTIONS[type]
+        deniedAgents: DENIED_CONNECTIONS[type] ||['ANY']
     }
 }
 
-export function generateTransformedAgent<T extends Agent>(type: AgentType, value: number|boolean =0, oldAgent: Agent): T {
+export function generateTransformedAgent<T extends Agent>(type: AgentType, value: number | boolean = 0, oldAgent: Agent): T {
     return {
         ...oldAgent,
         type,
         value,
         transformationCount: oldAgent.transformationCount + 1,
-        label:'Result'
+        label: 'Result'
     } as T;
 }
 

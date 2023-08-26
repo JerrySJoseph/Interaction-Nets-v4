@@ -1,13 +1,14 @@
 export interface Agent {
     id: string,
     type: AgentType,
-    maxAllowedPorts: number
+    arity: number
     principalPort?: string | null
     auxiliaryPorts: string[],
     value: number,
     label: string,
     description?: string
     x: number,
+    symbol:string,
     y: number,
     transformationCount: number,
     deniedAgents: AgentType[]|string[]
@@ -18,13 +19,6 @@ export interface NumberAgent extends Agent {
     allowEdit?: boolean
 };
 
-export interface SumAgent extends Agent {
-    type: 'SUM';
-}
-
-export interface IncrementAgent extends Agent {
-    type: 'INC';
-}
 
 export interface BooleanAgent extends Agent {
     type: 'BOOL',
@@ -54,7 +48,7 @@ type ArrayElement={
     value:number
 }
 
-export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS'|'NOT_EQUALS'|
+export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS'|'NOT_EQUALS'|
 'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS'|'ARRAY'|'SUCC';
 
 
@@ -77,8 +71,6 @@ export function isAgentType(variable: any): variable is AgentType {
         variable === 'SUB' ||
         variable === 'MUL' ||
         variable === 'DIV' ||
-        variable === 'SUM' ||
-        variable === 'INC' ||
         variable === 'BOOL' ||
         variable === 'COUNT_AUX_PORT'||
         variable === 'EQUALS' ||
