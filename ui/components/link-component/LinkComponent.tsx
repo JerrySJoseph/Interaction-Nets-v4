@@ -24,8 +24,7 @@ const LinkComponent = ({ x1, x2, y1, y2, index }: LinkComponentProps) => {
 
     // Calculate the direction (angle) of the arrow
     const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-    const circleX = mx + xOffset;
-    const circleY = my + yOffset;
+  
 
     return (
         <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
@@ -36,32 +35,13 @@ const LinkComponent = ({ x1, x2, y1, y2, index }: LinkComponentProps) => {
             {/* Draw the arrowhead in the middle of the line */}
             <polygon
                 points="0,-5 10,0 0,5"
-                transform={`translate(${mx + xOffset}, ${my + yOffset}) rotate(${angle})`}
+                transform={`translate(${mx + xOffset}, ${my + yOffset}) rotate(${angle+180})`}
                 fill={colorScheme === 'dark' ? 'white' : 'black'}
             />
 
             {/* Display the circle with the number */}
 
-            {
-                index && <>
-                    <circle
-                        cx={circleX}
-                        cy={circleY}
-                        r="10" // Adjust the radius as needed
-                        fill={colorScheme === "dark" ? "white" : "black"}
-                    />
-                    <text
-                        x={circleX}
-                        y={circleY}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill={colorScheme === "dark" ? "black" : "white"}
-                        fontSize="10"
-                    >
-                        {index}
-                    </text>
-                </>
-            }
+           
 
 
         </svg>

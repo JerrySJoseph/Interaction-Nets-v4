@@ -9,7 +9,9 @@ const customTheme:MantineThemeOverride={
 
 export const AgentColors={
     'NUMBER':'#495057',
+    'ARRAY':'#495057',
     'ADD':'#F59F00',
+    'SUCC':'#F59F00',
     'SUB':'#F59F00',
     'MUL':'#F59F00',
     'DIV':'#F59F00',

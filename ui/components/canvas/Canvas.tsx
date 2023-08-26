@@ -98,7 +98,7 @@ const Canvas = () => {
         <div className="canvas-container">
             <Card className='canvas-controls' withBorder p='xs'>
                 <Group position='apart'>
-                    <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Reduce</Button>
+                    <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Compute</Button>
                     {
                         alert && <Alert color={alert.color} m={0} p={5}>
                             <Text size='xs'>{alert?.message}</Text>
@@ -111,7 +111,7 @@ const Canvas = () => {
             <div ref={canvasRef} className="canvas" onClick={handleOnClick}
 
                 style={{
-                    cursor: ['NUMBER', 'ADD', 'SUM', 'MUL', 'DIV', 'SUB'].includes(toolID) ? 'crosshair' : 'default'
+                    cursor: isAgentType(toolID) ? 'crosshair' : 'default'
                 }}
 
             >
@@ -142,7 +142,7 @@ const Canvas = () => {
 
                 }
                 {
-                    connectorSrc && <LinkComponent x1={inetState.agents[connectorSrc].x} y1={inetState.agents[connectorSrc].y} x2={mouseCordinates.x} y2={mouseCordinates.y} feedback />
+                    connectorSrc && <LinkComponent x2={inetState.agents[connectorSrc].x} y2={inetState.agents[connectorSrc].y} x1={mouseCordinates.x} y1={mouseCordinates.y} feedback />
                 }
             </div>
         </div>

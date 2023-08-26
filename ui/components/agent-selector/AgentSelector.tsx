@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers, IconEqual, IconEqualNot, IconMathEqualLower, IconMathEqualGreater, IconMathGreater, IconMathLower } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers, IconEqual, IconEqualNot, IconMathEqualLower, IconMathEqualGreater, IconMathGreater, IconMathLower, IconLayoutGrid, IconLetterS } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
@@ -10,15 +10,16 @@ const toolSetMenuData: { label: string, icon: ReactNode, type: ToolType }[] = [
    
     { label: 'Auxilary Link', icon: <IconLine />, type: 'AUX_LINK' },
     { label: 'Principal Link', icon: <IconArrowUpRightCircle />, type: 'PRINCIPAL_LINK' },
-    { label: 'Drag Node', icon: <IconHandMove />, type: 'DRAG' }
+    { label: 'Drag Agent', icon: <IconHandMove />, type: 'DRAG' }
 ]
 
 const arithmeticAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
-    { label: 'Number Node', icon: <IconCircleLetterN />, type: 'NUMBER' },
-    { label: 'Addition Node', icon: <IconPlus />, type: 'ADD' },
-    { label: 'Multiplication Node', icon: <IconX />, type: 'MUL' },
-    { label: 'Subtraction Node', icon: <IconMinus />, type: 'SUB' },
-    { label: 'Division Node', icon: <IconDivide />, type: 'DIV' },
+    { label: 'Number Agent', icon: <IconCircleLetterN />, type: 'NUMBER' },
+    { label: 'Addition Agent', icon: <IconPlus />, type: 'ADD' },
+    { label: 'Multiplication Agent', icon: <IconX />, type: 'MUL' },
+    { label: 'Subtraction Agent', icon: <IconMinus />, type: 'SUB' },
+    { label: 'Division Agent', icon: <IconDivide />, type: 'DIV' },
+    { label: 'Successor Agent', icon: <IconLetterS />, type: 'SUCC' },
 ]
 
 const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
@@ -29,6 +30,11 @@ const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
     { label: 'Greater than equals', icon: <IconMathEqualGreater/>, type: 'GREATER_THAN_EQUALS' },
     { label: 'Less Than', icon: <IconMathLower />, type: 'LESS_THAN' },
     { label: 'Greater Than', icon: <IconMathGreater />, type: 'GREATER_THAN' }
+]
+
+const ComplexAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
+   
+    { label: 'Array', icon: <IconLayoutGrid />, type: 'EQUALS' },
 ]
 
 const AgentSelector = () => {

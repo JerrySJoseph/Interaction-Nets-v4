@@ -128,39 +128,38 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
     function connectAgent(source: string, target: string) {
         const inetCopy = { ...inetState };
-        const sourceAgent = inetCopy.agents[source];
-        const targetAgent = inetCopy.agents[target];
+        const sourceAgent  = inetCopy.agents[source];
+        const targetAgent  = inetCopy.agents[target];
 
         //if not either of node exists
-        if (!sourceAgent || !targetAgent)
+        if (!targetAgent || !sourceAgent)
             return;
 
-        console.log(targetAgent);
 
         try {
 
             // if source is a number type
-            if (sourceAgent.type === 'NUMBER')
-                throw new Error('Cannot connect Number as a source type to Any agent. Try connecting any other agent to Number');
+            if (targetAgent.type === 'NUMBER')
+                throw new Error('Cannot connect Number as a target type to Any agent. Try connecting any other Number to this agent');
 
-            if (sourceAgent.maxAllowedPorts <= sourceAgent.auxiliaryPorts.length)
-                throw new Error(`${sourceAgent.type} has reached max connections limit (${sourceAgent.maxAllowedPorts}).`)
+            if (targetAgent.maxAllowedPorts <= targetAgent.auxiliaryPorts.length)
+                throw new Error(`${targetAgent.type} has reached max connections limit (${targetAgent.maxAllowedPorts}).`)
 
             // connection already exists
-            if (sourceAgent.auxiliaryPorts.includes(target))
+            if (targetAgent.auxiliaryPorts.includes(target))
                 throw new Error('Connection already exists');
 
-            if (sourceAgent.type === 'COUNT_AUX_PORT') {
+            if (targetAgent.type === 'COUNT_AUX_PORT') {
                 throw new Error('COUNT Agent cannot be connected through aux ports to any other agents')
             }
 
             // if target node doesn't allow this type of node connection
-            if (targetAgent.deniedAgents.length > 0 && !targetAgent.deniedAgents.includes('ANY') && targetAgent.deniedAgents.includes(sourceAgent.type)) {
-                throw new Error('Connection not allowed. ' + targetAgent.type + ' cannot accepts connections from ' + targetAgent.deniedAgents.join(', '));
+            if (sourceAgent.deniedAgents.length > 0 && !sourceAgent.deniedAgents.includes('ANY') && sourceAgent.deniedAgents.includes(targetAgent.type)) {
+                throw new Error('Connection not allowed. ' + sourceAgent.type + ' cannot accepts connections from ' + sourceAgent.deniedAgents.join(', '));
             }
 
             //save the connection if everything works out.
-            sourceAgent.auxiliaryPorts.push(target);
+            targetAgent.auxiliaryPorts.push(source);
             setInetState(inetCopy);
         } catch (error) {
             setAlert({

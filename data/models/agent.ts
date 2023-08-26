@@ -44,8 +44,18 @@ export type CountAuxPortAgent = {
     type: 'COUNT_AUX_PORT'
 }
 
+export type ArrayAgent={
+    type:'ARRAY'
+    dimensions:number
+}
+
+type ArrayElement={
+    index:number,
+    value:number
+}
+
 export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SUM' | 'INC' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS'|'NOT_EQUALS'|
-'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS';
+'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS'|'ARRAY'|'SUCC';
 
 
 
@@ -76,7 +86,9 @@ export function isAgentType(variable: any): variable is AgentType {
         variable === 'LESS_THAN_EQUALS' ||
         variable === 'GREATER_THAN_EQUALS' ||
         variable === 'LESS_THAN' ||
-        variable === 'GREATER_THAN'
+        variable === 'GREATER_THAN' ||
+        variable === 'ARRAY'||
+        variable === 'SUCC'
         
     );
 }
