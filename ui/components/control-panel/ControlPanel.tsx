@@ -17,7 +17,7 @@ const ControlPanel = () => {
             <Tabs defaultValue="agents">
                 <Tabs.List>
                     <Tabs.Tab value="agents" icon={<IconCircle size="0.8rem" />}>Agents</Tabs.Tab>
-                    <Tabs.Tab value="settings" icon={<IconSettings size="0.8rem" />}>Settings</Tabs.Tab>
+                  
                 </Tabs.List>
 
                 <Tabs.Panel value="agents" pt="xs" style={{
@@ -44,9 +44,7 @@ const ControlPanel = () => {
                     </Stack>
                 </Tabs.Panel>
 
-                <Tabs.Panel value="settings" pt="xs">
-                    Settings tab content
-                </Tabs.Panel>
+               
             </Tabs>
 
         </Card>
