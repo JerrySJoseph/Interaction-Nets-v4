@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Select, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
+import { ActionIcon, Alert, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Select, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
 import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLetterR, IconLine, IconPencil, IconPlus, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
@@ -12,7 +12,7 @@ const ControlPanel = () => {
 
     const { primaryColor } = useMantineTheme();
 
-    const [ruleEditorOpen,setruleEditorOpen]=useState(false);
+    const [ruleEditorOpen, setruleEditorOpen] = useState(false);
 
     return (
         <Card h='100%'>
@@ -50,14 +50,17 @@ const ControlPanel = () => {
                     maxHeight: '80vh'
                 }}>
                     <Stack spacing='xs' justify='center'>
-                        <Button leftIcon={<IconPlus />} onClick={()=>setruleEditorOpen(true)}>Add New Rule</Button>
+
+                        <Button leftIcon={<IconPlus />} onClick={() => setruleEditorOpen(true)}>Add New Rule</Button>
                     </Stack>
                 </Tabs.Panel>
 
 
             </Tabs>
-            <Modal opened={ruleEditorOpen} onClose={()=>setruleEditorOpen(false)} title="Add rewrite rule" size='lg' centered>
-                
+            <Modal opened={ruleEditorOpen} onClose={() => setruleEditorOpen(false)} title="Add rewrite rule" size='lg' centered>
+                <Alert color='yellow'>
+                    Sorry for your inconvenience. This feature is currently under development and will soon be released. 
+                </Alert>
             </Modal>
 
         </Card>

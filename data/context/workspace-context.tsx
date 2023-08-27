@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { applyInteractionRules, compute } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, DivideInteractionRule, DuplicateInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule, SuccessorInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, DivideInteractionRule, DuplicateAnyInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule, SuccessorInteractionRule } from "../models/interaction-rule";
 
 export type InteractionNetState = {
     agents: AgentsDictionary,
@@ -44,7 +44,7 @@ interface WorkspaceContextProps {
         alert: AlertType | null
         reduce: () => any,
         reducing: boolean,
-        compute:()=>any
+        compute: () => any
     }
 
 }
@@ -84,7 +84,7 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         alert: null,
         reduce: () => { },
         reducing: false,
-        compute:()=>{}
+        compute: () => { }
     }
 }
 
@@ -108,7 +108,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     const [previousInetStates, setPreviousInetStates] = useState<InteractionNetState[]>([]);
     const [currentStateIndex, setCurrentStateIndex] = useState(-1);
     const [alert, setAlert] = useState<AlertType | null>(null);
-    const [computing,setComputing]=useState(false);
+    const [computing, setComputing] = useState(false);
 
     useEffect(() => {
         const timeout = setTimeout(() => setAlert(null), 3000);
@@ -120,7 +120,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,
             EqualsInteractionRule, NotEqualsInteractionRule, LessThanEqualsInteractionRule, GreaterTHanEqualsInteractionRule,
             LessThanInteractionRule, GreaterTHanEqualsInteractionRule,
-            SuccessorInteractionRule,DuplicateInteractionRule])
+            SuccessorInteractionRule, DuplicateAnyInteractionRule])
     }, []);
 
 
@@ -141,8 +141,9 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         if (!targetAgent || !sourceAgent)
             return;
 
-        if(targetAgent.type==='NUMBER'){
-            connectP2P(source,target);
+        if (targetAgent.type === 'NUMBER') {
+            console.log('Target is number, switching to P2P')
+            connectP2P(source, target);
         }
 
 
@@ -186,19 +187,19 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         const inetCopy = { ...inetState };
         const sourceAgent = inetCopy.agents[source];
         const targetAgent = inetCopy.agents[target];
-        console.log('Attemplting remove connection',source,target,inetState);
+        console.log('Attemplting remove connection', source, target, inetState);
         //if not either of node exists
         if (!targetAgent || !sourceAgent)
-        return;
-        console.log('remove connection',sourceAgent,targetAgent);
+            return;
+        console.log('remove connection', sourceAgent, targetAgent);
         //check if source agent is connected to target agent via principal port
         if (sourceAgent.principalPort === target)
             sourceAgent.principalPort = undefined;
         if (targetAgent.principalPort === source)
             targetAgent.principalPort = undefined;
 
-        targetAgent.auxiliaryPorts=targetAgent.auxiliaryPorts.filter(id => id != source);
-        sourceAgent.auxiliaryPorts=sourceAgent.auxiliaryPorts.filter(id => id != target);
+        targetAgent.auxiliaryPorts = targetAgent.auxiliaryPorts.filter(id => id != source);
+        sourceAgent.auxiliaryPorts = sourceAgent.auxiliaryPorts.filter(id => id != target);
 
         setInetState(inetCopy);
     }
@@ -211,6 +212,11 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
 
         if (!sourceAgent || !targetAgent)
             return;
+
+        if (targetAgent.type === 'NUMBER') {
+            console.log('Target is number, switching to P2P')
+            connectP2P(source, target);
+        }
 
         sourceAgent.principalPort = target;
         targetAgent.auxiliaryPorts.push(source);
@@ -266,9 +272,9 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         }
     }
 
-    function updateAgent(agent:Agent){
+    function updateAgent(agent: Agent) {
         const inetCopy = { ...inetState };
-        inetCopy.agents[agent.id]=agent;
+        inetCopy.agents[agent.id] = agent;
         setInetState(inetCopy);
     }
 
@@ -320,7 +326,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             alert,
             reduce,
             reducing,
-            compute:_compute
+            compute: _compute
         }
     };
 

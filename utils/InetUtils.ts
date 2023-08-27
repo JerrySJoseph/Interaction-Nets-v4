@@ -24,14 +24,22 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
         if (principalAgent) {
 
+
             //rewrite rules for p2p
             rules.forEach(r => {
-                if ((r.sourceType === agent.type && r.targetType === principalAgent.type) ||
-                    (r.sourceType === principalAgent.type && r.targetType === agent.type)) {
-                        console.log('applying rewrite rule')
+                let done=false;
+                if ((r.sourceType === agent.type && r.targetType === principalAgent.type) && !done) {
+                        console.log('applying rewrite rule 1')
                     r.rewrite && r.rewrite(agent, principalAgent, agents);
-                    steps.push({ ...inetState });
+                    done=true;                   
                 }
+                else if((r.sourceType === agent.type && r.targetType=='ANY') && !done){
+                    console.log('applying rewrite rule 2')
+                    r.rewrite && r.rewrite(agent, principalAgent, agents);
+                    done=true;
+                }
+                
+                steps.push({ ...inetState });
             })
 
         }
@@ -45,12 +53,12 @@ export async function compute(rules: InteractionRule[], inetState: InteractionNe
 
     const agents = { ...inetState.agents };
     const steps: InteractionNetState[] = [inetState];
+
     for (const agentId in agents) {
         const agent = agents[agentId];
         // console.log('Agent selected ', agent.id);
         if (agent.type === 'NUMBER')
             continue;
-
 
         const principalID = agent.principalPort;
         const principalAgent = principalID ? agents[principalID] : undefined;
@@ -169,7 +177,7 @@ export function generateTransformedAgent<T extends Agent>(type: AgentType, value
         type,
         value,
         transformationCount: oldAgent.transformationCount + 1,
-        label: 'Result'
+        label: `${type} #${oldAgent.id}`
     } as T;
 }
 
