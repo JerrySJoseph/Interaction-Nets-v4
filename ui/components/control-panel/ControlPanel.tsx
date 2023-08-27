@@ -19,7 +19,7 @@ const ControlPanel = () => {
             <Tabs defaultValue="agents">
                 <Tabs.List>
                     <Tabs.Tab value="agents" icon={<IconCircle size="0.8rem" />}>Agents</Tabs.Tab>
-                    <Tabs.Tab value="rw-rules" icon={<IconLetterR size="0.8rem" />}>Rewrite Rules</Tabs.Tab>
+                   
                 </Tabs.List>
 
                 <Tabs.Panel value="agents" pt="xs" style={{
@@ -45,23 +45,11 @@ const ControlPanel = () => {
                         }
                     </Stack>
                 </Tabs.Panel>
-                <Tabs.Panel value="rw-rules" pt="xs" style={{
-                    overflowY: 'auto',
-                    maxHeight: '80vh'
-                }}>
-                    <Stack spacing='xs' justify='center'>
-
-                        <Button leftIcon={<IconPlus />} onClick={() => setruleEditorOpen(true)}>Add New Rule</Button>
-                    </Stack>
-                </Tabs.Panel>
+               
 
 
             </Tabs>
-            <Modal opened={ruleEditorOpen} onClose={() => setruleEditorOpen(false)} title="Add rewrite rule" size='lg' centered>
-                <Alert color='yellow'>
-                    Sorry for your inconvenience. This feature is currently under development and will soon be released. 
-                </Alert>
-            </Modal>
+           
 
         </Card>
     )
