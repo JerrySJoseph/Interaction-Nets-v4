@@ -1,5 +1,5 @@
 import { ActionIcon, Badge, Button, Card, Collapse, Divider, Group, Image, Modal, NumberInput, Select, Stack, Tabs, Text, TextInput, ThemeIcon, useMantineTheme } from '@mantine/core'
-import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLine, IconPencil, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
+import { IconAbc, IconArrowBadgeDownFilled, IconArrowBadgeUpFilled, IconArrowUpRightCircle, IconCheck, IconCircle, IconLetterR, IconLine, IconPencil, IconPlus, IconSettings, IconTrash, IconVariable } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { Agent, BooleanAgent, NumberAgent } from '../../../data/models/agent'
@@ -10,14 +10,16 @@ const ControlPanel = () => {
 
     const { inetState } = useWorkspace().currentInetState;
 
-    const { primaryColor } = useMantineTheme()
+    const { primaryColor } = useMantineTheme();
+
+    const [ruleEditorOpen,setruleEditorOpen]=useState(false);
 
     return (
         <Card h='100%'>
             <Tabs defaultValue="agents">
                 <Tabs.List>
                     <Tabs.Tab value="agents" icon={<IconCircle size="0.8rem" />}>Agents</Tabs.Tab>
-                  
+                    <Tabs.Tab value="rw-rules" icon={<IconLetterR size="0.8rem" />}>Rewrite Rules</Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="agents" pt="xs" style={{
@@ -43,9 +45,20 @@ const ControlPanel = () => {
                         }
                     </Stack>
                 </Tabs.Panel>
+                <Tabs.Panel value="rw-rules" pt="xs" style={{
+                    overflowY: 'auto',
+                    maxHeight: '80vh'
+                }}>
+                    <Stack spacing='xs' justify='center'>
+                        <Button leftIcon={<IconPlus />} onClick={()=>setruleEditorOpen(true)}>Add New Rule</Button>
+                    </Stack>
+                </Tabs.Panel>
 
-               
+
             </Tabs>
+            <Modal opened={ruleEditorOpen} onClose={()=>setruleEditorOpen(false)} title="Add rewrite rule" size='lg' centered>
+                
+            </Modal>
 
         </Card>
     )
@@ -59,10 +72,10 @@ const AgentCard = ({ agent }: AgentCardProps) => {
 
     const [expand, setExpand] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [formData, setFormData] = useState<{ label: string, value: number,boolValue?:boolean }>({
+    const [formData, setFormData] = useState<{ label: string, value: number, boolValue?: boolean }>({
         label: agent.label,
         value: agent.value,
-        boolValue:(agent as BooleanAgent).boolValue || false
+        boolValue: (agent as BooleanAgent).boolValue || false
     })
 
     const { inetState } = useWorkspace().currentInetState
@@ -96,7 +109,7 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                         <NodeComponent agent={agent} thumbnail dragDisabled />
                         <Stack spacing={0}>
                             <Text size='md' fw={700}>{agent.label} <Badge variant='outline' color={AgentColors[agent.type]} size='xs'>{agent.type}</Badge></Text>
-                            <Text size='sm' color={useMantineTheme().primaryColor}>Value: {agent.type==='BOOL'?(agent as BooleanAgent).boolValue.toString():agent.value}</Text>
+                            <Text size='sm' color={useMantineTheme().primaryColor}>Value: {agent.type === 'BOOL' ? (agent as BooleanAgent).boolValue.toString() : agent.value}</Text>
                         </Stack>
                     </Group>
                     <ActionIcon variant='filled' onClick={() => setExpand(!expand)}>
@@ -164,14 +177,14 @@ const AgentCard = ({ agent }: AgentCardProps) => {
                             {
                                 agent.type === 'BOOL' &&
                                 <Select
-                                    defaultValue={formData.boolValue? 'TRUE' : "FALSE"}
+                                    defaultValue={formData.boolValue ? 'TRUE' : "FALSE"}
                                     placeholder="Eg: TRUE"
                                     label="Boolean Value of Agent"
                                     size="xs"
                                     disabled={!!(agent as NumberAgent).allowEdit}
                                     data={[{ label: 'TRUE', value: 'true' }, { label: 'FALSE', value: 'false' }]}
-                                    onChange={e => setFormData(prev => ({ ...prev, boolValue:e==='true'}))}
-                                    value={formData.boolValue?'true':'false'}
+                                    onChange={e => setFormData(prev => ({ ...prev, boolValue: e === 'true' }))}
+                                    value={formData.boolValue ? 'true' : 'false'}
                                     withAsterisk
                                 />
                             }

@@ -27,6 +27,9 @@ export const AgentColors={
     'GREATER_THAN_EQUALS':'#F59F00',
     'LESS_THAN':'#F59F00',
     'GREATER_THAN':'#F59F00',
+    'DUPLICATE':'#339AF0',
+    'CONST':'#339AF0',
+    'ERASE':'#339AF0'
 }
 
 export default customTheme

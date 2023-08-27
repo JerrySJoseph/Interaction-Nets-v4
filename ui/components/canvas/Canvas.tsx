@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Group, Text } from '@mantine/core';
-import { IconArrowBigRightLines, IconX } from '@tabler/icons-react';
+import { IconArrowBigRightLines, IconList, IconX } from '@tabler/icons-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from '../../../data/context/workspace-context';
 import { Agent, isAgentType } from '../../../data/models/agent';
@@ -9,11 +9,11 @@ import NodeComponent from '../node-component/NodeComponent';
 import PrincipalLinkComponent from '../principal-link-component/PrincipalLinkComponent';
 
 const Canvas = () => {
-    const { inetState, moveNode, updateAgent, connectAgent, connectPrincipal, setInetState } = useWorkspace().currentInetState;
+    const { inetState, moveNode, updateAgent, connectAgent, connectPrincipal, connectP2P, setInetState, removeConnection } = useWorkspace().currentInetState;
 
     const { toolID } = useWorkspace().currentTool;
 
-    const { reduce, reducing, alert } = useWorkspace().controls;
+    const { reduce, reducing, alert ,compute} = useWorkspace().controls;
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -26,11 +26,11 @@ const Canvas = () => {
     useEffect(() => {
         if (canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();
-           
+
         }
     }, [canvasRef]);
 
-    let target;
+    let target: string | null | undefined;
 
 
     function handleOnClick(e: React.MouseEvent) {
@@ -47,7 +47,7 @@ const Canvas = () => {
         const y = e.clientY - rect.top - 20;  // y position within the element
         if (isAgentType(toolID)) {
             const newAgent = generateAgent(toolID, 0, x, y);
-         
+
             updateAgent(newAgent);
         }
         if (connectorSrc)
@@ -69,6 +69,15 @@ const Canvas = () => {
                 setconnectorSrc(agent.id)
             else {
                 connectPrincipal(connectorSrc, agent.id);
+                setconnectorSrc('')
+            }
+
+        }
+        if (toolID === 'P2P') {
+            if (!connectorSrc)
+                setconnectorSrc(agent.id)
+            else {
+                connectP2P(connectorSrc, agent.id);
                 setconnectorSrc('')
             }
 
@@ -98,7 +107,10 @@ const Canvas = () => {
         <div className="canvas-container">
             <Card className='canvas-controls' withBorder p='xs'>
                 <Group position='apart'>
-                    <Button loading={reducing} onClick={reduce} leftIcon={<IconArrowBigRightLines />}> Compute</Button>
+                    <Group>
+                        <Button loading={reducing} onClick={compute} leftIcon={<IconArrowBigRightLines />}> Compute</Button>
+                        <Button loading={reducing} onClick={reduce} leftIcon={<IconList />}> Reduce</Button>
+                    </Group>
                     {
                         alert && <Alert color={alert.color} m={0} p={5}>
                             <Text size='xs'>{alert?.message}</Text>
@@ -130,11 +142,11 @@ const Canvas = () => {
                                     const target = inetState.agents[lk];
                                     if (!source || !target)
                                         return <></>
-                                    return <LinkComponent key={`${ak}-${lk}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} source={source.id} target={target.id} index={i + 1} />
+                                    return <LinkComponent key={`${ak}-${lk}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} source={source.id} target={target.id} index={i + 1}  />
                                 })
                             }
                             {(target = inetState.agents[ak].principalPort) && inetState.agents[target] &&
-                                <PrincipalLinkComponent x1={inetState.agents[ak].x} y1={inetState.agents[ak].y} x2={inetState.agents[target].x} y2={inetState.agents[target].y} />
+                                <LinkComponent x1={inetState.agents[ak].x} y1={inetState.agents[ak].y} x2={inetState.agents[target].x} y2={inetState.agents[target].y} principal={inetState.agents[target].principalPort === ak}/>
                             }
 
                         </>

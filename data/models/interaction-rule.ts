@@ -1,9 +1,11 @@
+import { uniqueId } from "lodash";
 import { generateTransformedAgent } from "../../utils/InetUtils";
-import { Agent, AgentsDictionary, AgentType, BooleanAgent, EqualsAgent, NumberAgent } from "./agent"
+import { Agent, AgentsDictionary, AgentType, BooleanAgent } from "./agent";
 
 export type InteractionRule = {
     sourceType: AgentType,
     targetType: AgentType,
+    rewrite?:(source:Agent, target:Agent,agents:AgentsDictionary)=>any,
     principalAction?: (source: Agent, target: Agent, agents: AgentsDictionary) => any
     action: (source: Agent, target: Agent, agents: AgentsDictionary) => any
 }
@@ -14,6 +16,7 @@ export const AddInteractionRule: InteractionRule = {
     targetType: 'NUMBER',
     principalAction:(source,target,agents)=>{
         if(source.type!=='ADD' || !source.principalPort) return;
+        if(target.type!=='NUMBER')return;
         const principalAgent=agents[source.principalPort];
         source.value=principalAgent.value;
         agents[source.id]=source;
@@ -237,14 +240,30 @@ export const SuccessorInteractionRule: InteractionRule = {
 
     },
     action: (source, target, agents) => {
+        
+       
+    }
+}
 
-        // source.value = target.value + 1;
-
-        // source.auxiliaryPorts = []
-        // // Removing the number agent from the dictionary (effectively "consuming" it)
-        // delete agents[target.id];
-
-        // const numberAgent: NumberAgent = generateTransformedAgent<NumberAgent>('NUMBER', source.value, source);
-        // agents[source.id] = numberAgent;
+export const DuplicateInteractionRule: InteractionRule = {
+    sourceType: 'DUPLICATE',
+    targetType: 'NUMBER',
+    principalAction:(source, target, agents)=>{
+      source.auxiliaryPorts.forEach((id,i)=>{
+        const auxAgent=agents[id];
+        const copy=generateTransformedAgent<typeof target>(target.type,target.value,{...target});
+        copy.id=uniqueId();
+        copy.x+=(50 *(i+1));
+        agents[copy.id]=copy;
+        auxAgent.principalPort=copy.id;
+        copy.principalPort=auxAgent.id
+        agents[auxAgent.id]=auxAgent
+      })
+      delete agents[target.id];
+      delete agents[source.id]
+    },
+    action: (source, target, agents) => {
+        
+       
     }
 }

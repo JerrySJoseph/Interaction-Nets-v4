@@ -49,7 +49,7 @@ type ArrayElement={
 }
 
 export type AgentType = 'ANY'|'NUMBER' | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'BOOL' | 'COUNT_AUX_PORT'|'EQUALS'|'NOT_EQUALS'|
-'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS'|'ARRAY'|'SUCC';
+'GREATER_THAN'|'LESS_THAN'|'GREATER_THAN_EQUALS'|'LESS_THAN_EQUALS'|'ARRAY'|'SUCC'|'DUPLICATE'|'CONST'|'ERASE';
 
 
 
@@ -80,7 +80,10 @@ export function isAgentType(variable: any): variable is AgentType {
         variable === 'LESS_THAN' ||
         variable === 'GREATER_THAN' ||
         variable === 'ARRAY'||
-        variable === 'SUCC'
+        variable === 'SUCC' ||
+        variable === 'DUPLICATE' ||
+        variable === 'CONST' ||
+        variable === 'ERASE'
         
     );
 }

@@ -13,32 +13,69 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
     for (const agentId in agents) {
         const agent = agents[agentId];
-        console.log('Agent selected ', agent.id);
+        // console.log('Agent selected ', agent.id);
         if (agent.type === 'NUMBER')
             continue;
 
 
         const principalID = agent.principalPort;
         const principalAgent = principalID ? agents[principalID] : undefined;
+
+
         if (principalAgent) {
+
+            //rewrite rules for p2p
+            rules.forEach(r => {
+                if ((r.sourceType === agent.type && r.targetType === principalAgent.type) ||
+                    (r.sourceType === principalAgent.type && r.targetType === agent.type)) {
+                    r.rewrite && r.rewrite(agent, principalAgent, agents);
+                    steps.push({ ...inetState });
+                }
+            })
+
+        }
+
+
+    };
+    return { agents, steps };
+}
+
+export async function compute(rules: InteractionRule[], inetState: InteractionNetState) {
+
+    const agents = { ...inetState.agents };
+    const steps: InteractionNetState[] = [inetState];
+    for (const agentId in agents) {
+        const agent = agents[agentId];
+        // console.log('Agent selected ', agent.id);
+        if (agent.type === 'NUMBER')
+            continue;
+
+
+        const principalID = agent.principalPort;
+        const principalAgent = principalID ? agents[principalID] : undefined;
+
+        if (principalAgent) {
+            /// rewrite rules for p2any
             rules.forEach(r => {
                 if (r.sourceType === agent.type && r.targetType === principalAgent.type && r.principalAction) {
                     r.principalAction(agent, principalAgent, agents);
                     steps.push({ ...inetState });
                 }
-            })
+            });
         }
 
+
+
         rules.forEach(r => {
-            console.log('rule selected', r.sourceType);
+            // console.log('rule selected', r.sourceType);
             if (r.sourceType === agent.type) {
-                console.log('Running rule', r.sourceType);
-                console.log('Auxilary ports ', agent.auxiliaryPorts.length)
+                //  console.log('Running rule', r.sourceType);
+                //  console.log('Auxilary ports ', agent.auxiliaryPorts.length)
 
                 agent.auxiliaryPorts.forEach(targetId => {
                     const target = agents[targetId];
                     if (target && r.targetType === target.type) {
-                        console.log('Applying rule ', agent.label, target.label)
+                        //  console.log('Applying rule ', agent.label, target.label)
                         r.action(agent, target, agents);
                         steps.push({ ...inetState });
                     }
@@ -46,12 +83,8 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
             }
 
         });
-
-
-
-
-    };
-    return { agents, steps };
+    }
+    return { agents }
 }
 
 function getRandomCordinate() {
@@ -73,7 +106,10 @@ const MAX_ALLOWED_PORTS: {
     'LESS_THAN': 2,
     'GREATER_THAN': 2,
     'LESS_THAN_EQUALS': 2,
-    'GREATER_THAN_EQUALS': 2
+    'GREATER_THAN_EQUALS': 2,
+    'DUPLICATE': 2,
+    'CONST': 2,
+    'ERASE': 1
 }
 const SYMBOLS: {
     [id: string]: string
@@ -89,7 +125,10 @@ const SYMBOLS: {
     'LESS_THAN': '<',
     'GREATER_THAN': '>',
     'LESS_THAN_EQUALS': '<=',
-    'GREATER_THAN_EQUALS': '>='
+    'GREATER_THAN_EQUALS': '>=',
+    'DUPLICATE': 'd',
+    'CONST': 'c',
+    'ERASE': 'e'
 }
 const DENIED_CONNECTIONS: {
     [id: string]: AgentType[] | string[]
@@ -105,18 +144,21 @@ const DENIED_CONNECTIONS: {
 }
 
 export function generateAgent(type: AgentType, value: number = 0, x: number = getRandomCordinate(), y: number = getRandomCordinate()): Agent {
+
+    const id = uniqueId();
+
     return {
-        id: uniqueId(),
+        id,
         value: value || type === 'NUMBER' ? Math.floor(Math.random() * 100) : type === 'MUL' ? 1 : 0,
         arity: MAX_ALLOWED_PORTS[type] || 0,
-        label: type.substring(0, 6),
+        label: `${type} #${id}`,
         x,
         y,
         type,
         symbol: SYMBOLS[type],
         auxiliaryPorts: [],
         transformationCount: 0,
-        deniedAgents: DENIED_CONNECTIONS[type] ||['ANY']
+        deniedAgents: DENIED_CONNECTIONS[type] || ['ANY']
     }
 }
 

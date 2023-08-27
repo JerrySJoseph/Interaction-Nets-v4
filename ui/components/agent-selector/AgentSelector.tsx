@@ -1,16 +1,17 @@
 import { ActionIcon, Card, Divider, Grid, Group, Title, Tooltip, useMantineTheme } from '@mantine/core'
-import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers, IconEqual, IconEqualNot, IconMathEqualLower, IconMathEqualGreater, IconMathGreater, IconMathLower, IconLayoutGrid, IconLetterS } from '@tabler/icons-react'
+import { IconArrowUpRightCircle, IconPlus, IconLine, IconNumber1, IconMinus,IconDivide, IconX,IconCrosshair,IconDragDrop2, IconSum, IconHandMove, IconCircleLetterN, IconCircleLetterC, IconListNumbers, IconEqual, IconEqualNot, IconMathEqualLower, IconMathEqualGreater, IconMathGreater, IconMathLower, IconLayoutGrid, IconLetterS, IconChartLine, IconDelta, IconLetterD, IconAlphabetGreek, IconSquareLetterD, IconSquareLetterC, IconSquareLetterE, IconArrowsDiagonalMinimize2, IconArrowsExchange } from '@tabler/icons-react'
 import React, { ReactNode } from 'react'
 import { useWorkspace } from '../../../data/context/workspace-context'
 import { AgentType } from '../../../data/models/agent'
 
-export type ToolType='AUX_LINK'|'PRINCIPAL_LINK'|'DRAG'
+export type ToolType='AUX_LINK'|'PRINCIPAL_LINK'|'DRAG'|'P2P'|'REMOVE'
 
 const toolSetMenuData: { label: string, icon: ReactNode, type: ToolType }[] = [
    
-    { label: 'Auxilary Link', icon: <IconLine />, type: 'AUX_LINK' },
-    { label: 'Principal Link', icon: <IconArrowUpRightCircle />, type: 'PRINCIPAL_LINK' },
-    { label: 'Drag Agent', icon: <IconHandMove />, type: 'DRAG' }
+    { label: 'Principal to Aux', icon: <IconArrowUpRightCircle />, type: 'PRINCIPAL_LINK' },
+    { label: 'Principal to Principal', icon: <IconArrowsDiagonalMinimize2 />, type: 'P2P' },
+    { label: 'Drag Agent', icon: <IconHandMove />, type: 'DRAG' },
+    { label: 'Remove Agents or Links', icon: <IconX />, type: 'REMOVE' }
 ]
 
 const arithmeticAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
@@ -32,9 +33,11 @@ const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
     { label: 'Greater Than', icon: <IconMathGreater />, type: 'GREATER_THAN' }
 ]
 
-const ComplexAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
+const Combinators: { label: string, icon: ReactNode, type: AgentType }[]=[
    
-    { label: 'Array', icon: <IconLayoutGrid />, type: 'EQUALS' },
+    { label: 'Duplicator', icon: <IconSquareLetterD />, type: 'DUPLICATE' },
+    { label: 'Constructor', icon: <IconSquareLetterC />, type: 'CONST' },
+    { label: 'Eraser', icon: <IconSquareLetterE />, type: 'ERASE' }
 ]
 
 const AgentSelector = () => {
@@ -97,6 +100,25 @@ const AgentSelector = () => {
             <Grid p='sm'>
                 {
                     logicAgentData.map(menuItem => (
+                        <Grid.Col span={6} key={menuItem.label}>
+                            <Group position='center'>
+                                <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
+                                    <ActionIcon variant={toolID === menuItem.type ? 'filled' : 'light'} size='xl' color={primaryColor} onClick={(e:React.MouseEvent) => handleOnClick(e,menuItem.type)}>
+                                        {menuItem.icon}
+                                    </ActionIcon>
+                                </Tooltip>
+                            </Group>
+                        </Grid.Col>
+                    ))
+                }
+            </Grid>
+            <Card.Section>
+                <Title size='xs' p='xs' ta='center'>Combinators</Title>
+                <Divider />
+            </Card.Section>
+            <Grid p='sm'>
+                {
+                    Combinators.map(menuItem => (
                         <Grid.Col span={6} key={menuItem.label}>
                             <Group position='center'>
                                 <Tooltip label={menuItem.label} position='right' withArrow color={primaryColor} openDelay={500} withinPortal >
