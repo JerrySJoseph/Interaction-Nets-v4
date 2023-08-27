@@ -4,9 +4,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { applyInteractionRules, compute } from "../../utils/InetUtils";
 import { Agent, AgentsDictionary } from "../models/agent";
 import { Connection } from "../models/connection";
-import { AddInteractionRule, DivideInteractionRule, DuplicateAnyInteractionRule, EqualsInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule, SuccessorInteractionRule } from "../models/interaction-rule";
+import { AddInteractionRule, DivideInteractionRule, DuplicateAnyInteractionRule, EqualsInteractionRule, EraseInteractionRule, GreaterTHanEqualsInteractionRule, InteractionRule, LessThanEqualsInteractionRule, LessThanInteractionRule, MultiplicationInteractionRule, NotEqualsInteractionRule, SubtractInteractionRule, SuccessorInteractionRule } from "../models/interaction-rule";
 
 export type InteractionNetState = {
+    id:number,
     agents: AgentsDictionary,
     connections: Connection[]
 }
@@ -55,7 +56,9 @@ const defaultWorkspaceContext: WorkspaceContextProps = {
         setCurrentTool: () => { }
     },
     currentInetState: {
+        
         inetState: {
+            id:0,
             agents: {},
             connections: []
         },
@@ -102,6 +105,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
     const [currentTool, setCurrentTool] = useState<string>('DRAG');
     const [inetRules, setInetRules] = useState<InteractionRule[]>([]);
     const [inetState, setInetState] = useState<InteractionNetState>({
+        id:0,
         agents: {},
         connections: []
     })
@@ -120,9 +124,12 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         setInetRules([AddInteractionRule, SubtractInteractionRule, MultiplicationInteractionRule, DivideInteractionRule,
             EqualsInteractionRule, NotEqualsInteractionRule, LessThanEqualsInteractionRule, GreaterTHanEqualsInteractionRule,
             LessThanInteractionRule, GreaterTHanEqualsInteractionRule,
-            SuccessorInteractionRule, DuplicateAnyInteractionRule])
+            SuccessorInteractionRule, DuplicateAnyInteractionRule,EraseInteractionRule])
     }, []);
 
+    useEffect(()=>{
+        setPreviousInetStates([...previousInetStates,inetState])
+    },[inetState])
 
 
 
@@ -142,16 +149,13 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             return;
 
         if (targetAgent.type === 'NUMBER') {
-            console.log('Target is number, switching to P2P')
             connectP2P(source, target);
+            return;
         }
 
 
         try {
 
-            // if source is a number type
-            if (targetAgent.type === 'NUMBER')
-                throw new Error('Cannot connect Number as a target type to Any agent. Try connecting any other Number to this agent');
 
             if (targetAgent.arity - 1 <= targetAgent.auxiliaryPorts.length)
                 throw new Error(`${targetAgent.type} has reached max arity limit (${targetAgent.arity - 1}).`)
@@ -187,11 +191,11 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         const inetCopy = { ...inetState };
         const sourceAgent = inetCopy.agents[source];
         const targetAgent = inetCopy.agents[target];
-        console.log('Attemplting remove connection', source, target, inetState);
+      
         //if not either of node exists
         if (!targetAgent || !sourceAgent)
             return;
-        console.log('remove connection', sourceAgent, targetAgent);
+     
         //check if source agent is connected to target agent via principal port
         if (sourceAgent.principalPort === target)
             sourceAgent.principalPort = undefined;
@@ -214,7 +218,6 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             return;
 
         if (targetAgent.type === 'NUMBER') {
-            console.log('Target is number, switching to P2P')
             connectP2P(source, target);
             return;
         }
@@ -242,8 +245,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
             setReducing(true)
             const { agents, steps } = await applyInteractionRules(inetRules, inetState);
             setInetState({ ...inetState, agents: { ...agents } });
-            setPreviousInetStates([...previousInetStates, ...steps])
-            setCurrentStateIndex(steps.length - 1)
+                        
 
         } catch (e) {
             setAlert({
@@ -259,10 +261,9 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         try {
 
             setComputing(true)
-            const { agents } = await compute(inetRules, inetState);
+            const { agents ,steps} = await compute(inetRules, inetState);
             setInetState({ ...inetState, agents: { ...agents } });
-
-
+           
         } catch (e) {
             setAlert({
                 color: 'red',

@@ -314,7 +314,33 @@ export const DuplicateAnyInteractionRule: InteractionRule = {
 
     },
     action: (source, target, agents) => {
-
+        
+     
 
     }
+}
+
+export const EraseInteractionRule:InteractionRule={
+    sourceType: 'ERASE',
+    targetType: 'ANY',
+    rewrite: (source, target, agents) => {
+        const newEraser=generateTransformedAgent<typeof source>('ERASE',0,{...source});
+        newEraser.id=uniqueId();
+        newEraser.y-=100;
+        newEraser.principalPort=undefined;
+        if(target.auxiliaryPorts.length>0){
+           
+            newEraser.principalPort=target.auxiliaryPorts[0];
+        }
+        if(newEraser.principalPort){
+           
+            agents[newEraser.id]=newEraser;
+        }
+        
+        delete agents[source.id];
+        delete agents[target.id];
+    },
+    action(source, target, agents) {
+        
+    },
 }

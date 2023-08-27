@@ -7,7 +7,8 @@ import { InteractionNetState } from "../data/context/workspace-context";
 
 export async function applyInteractionRules(rules: InteractionRule[], inetState: InteractionNetState) {
 
-    const agents = { ...inetState.agents };
+    const newInetState = { ...inetState };
+    const { agents } = newInetState;
     const steps: InteractionNetState[] = [inetState];
 
 
@@ -27,19 +28,25 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
             //rewrite rules for p2p
             rules.forEach(r => {
-                let done=false;
+                let done = false;
                 if ((r.sourceType === agent.type && r.targetType === principalAgent.type) && !done) {
-                        console.log('applying rewrite rule 1')
+                    console.log('applying rewrite rule ', r.sourceType, r.targetType);
                     r.rewrite && r.rewrite(agent, principalAgent, agents);
-                    done=true;                   
+                    done = true;
+                    newInetState.id += 1;
+                    steps.push(newInetState);
+                    // steps.push({ ...inetState,agents });                   
                 }
-                else if((r.sourceType === agent.type && r.targetType=='ANY') && !done){
-                    console.log('applying rewrite rule 2')
+                else if ((r.sourceType === agent.type && r.targetType == 'ANY') && !done) {
+                    console.log('applying rewrite rule ', r.sourceType, r.targetType);
                     r.rewrite && r.rewrite(agent, principalAgent, agents);
-                    done=true;
+                    done = true;
+                    newInetState.id += 1;
+                    // steps.push({ ...inetState,agents });
+                    steps.push(newInetState);
                 }
-                
-                steps.push({ ...inetState });
+
+
             })
 
         }
@@ -51,8 +58,8 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
 export async function compute(rules: InteractionRule[], inetState: InteractionNetState) {
 
-    
-    const {agents} = await applyInteractionRules(rules,inetState);
+    const newInetState = { ...inetState };
+    const { agents } = await applyInteractionRules(rules, newInetState);
     const steps: InteractionNetState[] = [inetState];
 
     for (const agentId in agents) {
@@ -69,7 +76,8 @@ export async function compute(rules: InteractionRule[], inetState: InteractionNe
             rules.forEach(r => {
                 if (r.sourceType === agent.type && r.targetType === principalAgent.type && r.principalAction) {
                     r.principalAction(agent, principalAgent, agents);
-                    steps.push({ ...inetState });
+                    newInetState.id += 1;
+                    steps.push(newInetState);
                 }
             });
         }
@@ -87,14 +95,15 @@ export async function compute(rules: InteractionRule[], inetState: InteractionNe
                     if (target && r.targetType === target.type) {
                         //  console.log('Applying rule ', agent.label, target.label)
                         r.action(agent, target, agents);
-                        steps.push({ ...inetState });
+                        newInetState.id += 1;
+                        steps.push(newInetState);
                     }
                 })
             }
 
         });
     }
-    return { agents }
+    return { agents ,steps}
 }
 
 function getRandomCordinate() {
