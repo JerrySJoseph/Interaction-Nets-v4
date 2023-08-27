@@ -28,6 +28,7 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
             rules.forEach(r => {
                 if ((r.sourceType === agent.type && r.targetType === principalAgent.type) ||
                     (r.sourceType === principalAgent.type && r.targetType === agent.type)) {
+                        console.log('applying rewrite rule')
                     r.rewrite && r.rewrite(agent, principalAgent, agents);
                     steps.push({ ...inetState });
                 }
