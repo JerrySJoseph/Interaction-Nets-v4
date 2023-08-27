@@ -216,6 +216,7 @@ export const WorkspaceContextProvider = ({ children }: WorkspaceContextProviderP
         if (targetAgent.type === 'NUMBER') {
             console.log('Target is number, switching to P2P')
             connectP2P(source, target);
+            return;
         }
 
         sourceAgent.principalPort = target;

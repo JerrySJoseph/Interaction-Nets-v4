@@ -278,7 +278,7 @@ export const DuplicateAnyInteractionRule: InteractionRule = {
     targetType: 'ANY',
     rewrite: (source, target, agents) => {
         const newSource=generateTransformedAgent<typeof source>(source.type,source.value,{...source});
-        console.log('calling any');
+        
         newSource.id=uniqueId();
         newSource.principalPort=undefined;
         source.auxiliaryPorts.forEach((id, i) => {
@@ -305,6 +305,7 @@ export const DuplicateAnyInteractionRule: InteractionRule = {
         delete agents[source.id];
         delete agents[target.id];
         if(!newSource.principalPort){
+            console.log('no principal')
             delete agents[newSource.id];
         }
         // delete agents[source.id]

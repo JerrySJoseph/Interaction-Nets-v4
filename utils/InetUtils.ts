@@ -1,5 +1,5 @@
 
-import { uniqueId } from "lodash";
+import { reduce, uniqueId } from "lodash";
 import { AgentsDictionary, Agent, AgentType } from "../data/models/agent";
 import { Connection } from "../data/models/connection";
 import { InteractionRule } from "../data/models/interaction-rule";
@@ -51,7 +51,8 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
 export async function compute(rules: InteractionRule[], inetState: InteractionNetState) {
 
-    const agents = { ...inetState.agents };
+    
+    const {agents} = await applyInteractionRules(rules,inetState);
     const steps: InteractionNetState[] = [inetState];
 
     for (const agentId in agents) {
