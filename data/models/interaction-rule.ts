@@ -20,6 +20,7 @@ export const AddInteractionRule: InteractionRule = {
         const principalAgent = agents[source.principalPort];
         source.value = principalAgent.value;
         agents[source.id] = source;
+        
     },
     action: (source, target, agents) => {
         if (source.type !== 'ADD' || target.type !== 'NUMBER') return;
@@ -245,28 +246,101 @@ export const SuccessorInteractionRule: InteractionRule = {
     }
 }
 
-export const DuplicateInteractionRule: InteractionRule = {
+// export const DuplicateInteractionRule: InteractionRule = {
+//     sourceType: 'DUPLICATE',
+//     targetType: 'NUMBER',
+//     rewrite: (source, target, agents) => {
+//         console.log('calling number');
+//         source.auxiliaryPorts.forEach((id, i) => {
+//             const auxAgent = agents[id];
+//             const copy = generateTransformedAgent<typeof target>(target.type, target.value, { ...target });
+//             copy.id = uniqueId();
+//             copy.x += (100 * (i + 1));
+//             agents[copy.id] = copy;
+//             auxAgent.principalPort = copy.id;
+//             copy.principalPort = auxAgent.id
+//             agents[auxAgent.id] = auxAgent
+//         })
+//         delete agents[target.id];
+//         delete agents[source.id]
+//     },
+//     principalAction: (source, target, agents) => {
+
+//     },
+//     action: (source, target, agents) => {
+
+
+//     }
+// }
+
+export const DuplicateAnyInteractionRule: InteractionRule = {
     sourceType: 'DUPLICATE',
-    targetType: 'NUMBER',
+    targetType: 'ANY',
     rewrite: (source, target, agents) => {
+        const newSource=generateTransformedAgent<typeof source>(source.type,source.value,{...source});
+        
+        newSource.id=uniqueId();
+        newSource.principalPort=undefined;
         source.auxiliaryPorts.forEach((id, i) => {
             const auxAgent = agents[id];
             const copy = generateTransformedAgent<typeof target>(target.type, target.value, { ...target });
             copy.id = uniqueId();
-            copy.x += (50 * (i + 1));
-            agents[copy.id] = copy;
+            copy.x +=100 *i;
+            copy.y+=100;
             auxAgent.principalPort = copy.id;
             copy.principalPort = auxAgent.id
-            agents[auxAgent.id] = auxAgent
+            copy.auxiliaryPorts=[newSource.id]
+            newSource.auxiliaryPorts[i] = copy.id;
+            agents[copy.id] = copy;
+            agents[auxAgent.id] = auxAgent;
         })
+        if(target.auxiliaryPorts.length>0){
+            agents[target.auxiliaryPorts[0]].principalPort=newSource.id
+            newSource.principalPort=agents[target.auxiliaryPorts[0]].id;
+        } 
+        
+        newSource.y-=100;
+        
+        agents[newSource.id] = newSource;
+        delete agents[source.id];
         delete agents[target.id];
-        delete agents[source.id]
+        if(!newSource.principalPort){
+            console.log('no principal')
+            delete agents[newSource.id];
+        }
+        // delete agents[source.id]
     },
     principalAction: (source, target, agents) => {
 
     },
     action: (source, target, agents) => {
-
+        
+     
 
     }
+}
+
+export const EraseInteractionRule:InteractionRule={
+    sourceType: 'ERASE',
+    targetType: 'ANY',
+    rewrite: (source, target, agents) => {
+        const newEraser=generateTransformedAgent<typeof source>('ERASE',0,{...source});
+        newEraser.id=uniqueId();
+        newEraser.y-=100;
+        newEraser.principalPort=undefined;
+        if(target.auxiliaryPorts.length>0){
+           
+            newEraser.principalPort=target.auxiliaryPorts[0];
+        }
+        if(newEraser.principalPort){
+           
+            agents[newEraser.id]=newEraser;
+        }
+        
+        delete agents[source.id];
+        delete agents[target.id];
+    },
+    action(source, target, agents) {
+        
+    },
 }

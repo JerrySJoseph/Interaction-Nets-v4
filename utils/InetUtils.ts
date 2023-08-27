@@ -1,5 +1,5 @@
 
-import { uniqueId } from "lodash";
+import { reduce, uniqueId } from "lodash";
 import { AgentsDictionary, Agent, AgentType } from "../data/models/agent";
 import { Connection } from "../data/models/connection";
 import { InteractionRule } from "../data/models/interaction-rule";
@@ -7,7 +7,8 @@ import { InteractionNetState } from "../data/context/workspace-context";
 
 export async function applyInteractionRules(rules: InteractionRule[], inetState: InteractionNetState) {
 
-    const agents = { ...inetState.agents };
+    const newInetState = { ...inetState };
+    const { agents } = newInetState;
     const steps: InteractionNetState[] = [inetState];
 
 
@@ -24,14 +25,28 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
         if (principalAgent) {
 
+
             //rewrite rules for p2p
             rules.forEach(r => {
-                if ((r.sourceType === agent.type && r.targetType === principalAgent.type) ||
-                    (r.sourceType === principalAgent.type && r.targetType === agent.type)) {
-                        console.log('applying rewrite rule')
+                let done = false;
+                if ((r.sourceType === agent.type && r.targetType === principalAgent.type) && !done) {
+                    console.log('applying rewrite rule ', r.sourceType, r.targetType);
                     r.rewrite && r.rewrite(agent, principalAgent, agents);
-                    steps.push({ ...inetState });
+                    done = true;
+                    newInetState.id += 1;
+                    steps.push(newInetState);
+                    // steps.push({ ...inetState,agents });                   
                 }
+                else if ((r.sourceType === agent.type && r.targetType == 'ANY') && !done) {
+                    console.log('applying rewrite rule ', r.sourceType, r.targetType);
+                    r.rewrite && r.rewrite(agent, principalAgent, agents);
+                    done = true;
+                    newInetState.id += 1;
+                    // steps.push({ ...inetState,agents });
+                    steps.push(newInetState);
+                }
+
+
             })
 
         }
@@ -43,14 +58,15 @@ export async function applyInteractionRules(rules: InteractionRule[], inetState:
 
 export async function compute(rules: InteractionRule[], inetState: InteractionNetState) {
 
-    const agents = { ...inetState.agents };
+    const newInetState = { ...inetState };
+    const { agents } = await applyInteractionRules(rules, newInetState);
     const steps: InteractionNetState[] = [inetState];
+
     for (const agentId in agents) {
         const agent = agents[agentId];
         // console.log('Agent selected ', agent.id);
         if (agent.type === 'NUMBER')
             continue;
-
 
         const principalID = agent.principalPort;
         const principalAgent = principalID ? agents[principalID] : undefined;
@@ -60,7 +76,8 @@ export async function compute(rules: InteractionRule[], inetState: InteractionNe
             rules.forEach(r => {
                 if (r.sourceType === agent.type && r.targetType === principalAgent.type && r.principalAction) {
                     r.principalAction(agent, principalAgent, agents);
-                    steps.push({ ...inetState });
+                    newInetState.id += 1;
+                    steps.push(newInetState);
                 }
             });
         }
@@ -78,14 +95,15 @@ export async function compute(rules: InteractionRule[], inetState: InteractionNe
                     if (target && r.targetType === target.type) {
                         //  console.log('Applying rule ', agent.label, target.label)
                         r.action(agent, target, agents);
-                        steps.push({ ...inetState });
+                        newInetState.id += 1;
+                        steps.push(newInetState);
                     }
                 })
             }
 
         });
     }
-    return { agents }
+    return { agents ,steps}
 }
 
 function getRandomCordinate() {
@@ -169,7 +187,7 @@ export function generateTransformedAgent<T extends Agent>(type: AgentType, value
         type,
         value,
         transformationCount: oldAgent.transformationCount + 1,
-        label: 'Result'
+        label: `${type} #${oldAgent.id}`
     } as T;
 }
 

@@ -36,7 +36,6 @@ const logicAgentData: { label: string, icon: ReactNode, type: AgentType }[]=[
 const Combinators: { label: string, icon: ReactNode, type: AgentType }[]=[
    
     { label: 'Duplicator', icon: <IconSquareLetterD />, type: 'DUPLICATE' },
-    { label: 'Constructor', icon: <IconSquareLetterC />, type: 'CONST' },
     { label: 'Eraser', icon: <IconSquareLetterE />, type: 'ERASE' }
 ]
 
@@ -51,7 +50,9 @@ const AgentSelector = () => {
         e.stopPropagation();
         e.preventDefault();
         setCurrentTool(selectedToolId);
-    }
+    };
+
+    
 
     return (
         <Card h='100%'>

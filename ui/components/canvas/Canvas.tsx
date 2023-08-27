@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Group, Text } from '@mantine/core';
-import { IconArrowBigRightLines, IconList, IconX } from '@tabler/icons-react';
+import { IconArrowBigRightLines, IconCalculator, IconCircle, IconList, IconPlayerPlay, IconX } from '@tabler/icons-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from '../../../data/context/workspace-context';
 import { Agent, isAgentType } from '../../../data/models/agent';
@@ -15,6 +15,8 @@ const Canvas = () => {
 
     const { reduce, reducing, alert ,compute} = useWorkspace().controls;
 
+    const {inetStates}=useWorkspace().history
+
     const canvasRef = useRef<HTMLDivElement>(null);
 
     const [connectorSrc, setconnectorSrc] = useState<string>('');
@@ -26,9 +28,12 @@ const Canvas = () => {
     useEffect(() => {
         if (canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();
-
         }
     }, [canvasRef]);
+
+    useEffect(()=>{
+        console.log('history',inetStates)
+    },[inetStates])
 
     let target: string | null | undefined;
 
@@ -108,15 +113,15 @@ const Canvas = () => {
             <Card className='canvas-controls' withBorder p='xs'>
                 <Group position='apart'>
                     <Group>
-                        <Button loading={reducing} onClick={compute} leftIcon={<IconArrowBigRightLines />}> Compute</Button>
-                        <Button loading={reducing} onClick={reduce} leftIcon={<IconList />}> Reduce</Button>
+                        <Button loading={reducing} onClick={compute} leftIcon={<IconPlayerPlay />}> Compute</Button>
+                        <Button loading={reducing} onClick={reduce} leftIcon={<IconCircle />}> Reduce</Button>
                     </Group>
                     {
                         alert && <Alert color={alert.color} m={0} p={5}>
                             <Text size='xs'>{alert?.message}</Text>
                         </Alert>
                     }
-                    <Button onClick={() => setInetState({ agents: {}, connections: [] })} color='red' leftIcon={<IconX />}> Clear</Button>
+                    <Button onClick={() => setInetState({ id:0, agents: {}, connections: [] })} color='red' leftIcon={<IconX />}> Clear</Button>
                 </Group>
             </Card>
             <div className="canvas-spacing"></div>
